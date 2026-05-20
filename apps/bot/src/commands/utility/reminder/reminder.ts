@@ -1,5 +1,5 @@
 import { Command } from '@sapphire/framework';
-import { MessageFlags } from 'discord.js';
+import { MessageFlags, SlashCommandBuilder } from 'discord.js';
 import ms, { type StringValue } from 'ms';
 import { createReminder, getReminder, removeReminder } from '#lib/reminders.js';
 import { LimitError } from '#lib/limits.js';
@@ -11,7 +11,7 @@ export class ReminderCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder: SlashCommandBuilder) =>
 			builder
 				.setName('reminder')
 				.setDescription('Set reminders!')
@@ -75,7 +75,7 @@ export class ReminderCommand extends Command {
 
 				const unix = Math.floor(remindAt.getTime() / 1000);
 				await interaction.reply({
-					content: `${emojis.rightArrow2} Reminder set to go off in <t:${unix}:R> message: ${message}\nID: \`${reminder.id}\``,
+					content: `${emojis.rightArrow2} Reminder set to go off in <t:${unix}:R>. Message: ${message}\nID: \`${reminder.id}\``,
 					allowedMentions: { parse: [] },
 				});
 
@@ -111,7 +111,7 @@ export class ReminderCommand extends Command {
 
 			if (reminder.userId !== interaction.user.id) {
 				await interaction.reply({
-					content: `${emojis.rightArrow2} You can't remove other's reminders.`,
+					content: `${emojis.rightArrow2} You can't remove others' reminders.`,
 					flags: MessageFlags.Ephemeral,
 				});
 				return;

@@ -1,6 +1,6 @@
 # Contributing to Quest Bot
 
-Contributing to Quest Bot requires basic knowledge of TypeScript, Discord.JS and prisma.
+Contributing to Quest Bot requires basic knowledge of TypeScript, Discord.JS and Prisma.
 
 ## AI Rules
 
@@ -15,6 +15,6 @@ Make sure to test the code you have made before creating a pull request.
 Use conventional commit messages for all commits.
 
 > [!NOTE]
-> When contributing to this project you agree that you have all rights to the content you have contributed and that these align with the projects license.
+> When contributing to this project you agree that you have all rights to the content you have contributed and that these align with the project's license.
 
 ## Thanks for your interest! ❤️
