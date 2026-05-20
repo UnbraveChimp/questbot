@@ -12,7 +12,7 @@ When committing code you take *full* responsibility for what you are committing.
 
 Please submit pull requests to the `dev` branch, unless this is a feature which requires a separate branch.
 Make sure to test the code you have made before creating a pull request.
-Format for commit messages, fix|upd|chore|dockerfile: (change made).
+Use conventional commit messages for all commits.
 
 > [!NOTE]
 > When contributing to this project you agree that you have all rights to the content you have contributed and that these align with the projects license.
