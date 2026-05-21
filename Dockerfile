@@ -31,4 +31,4 @@ RUN pnpm install --prod --frozen-lockfile --filter @duckorganization/questbot
 
 COPY --from=builder /app/apps/bot/dist ./apps/bot/dist
 
-CMD ["sh", "-c", "pnpm --filter @quest/database db:push && pnpm --filter @duckorganization/questbot start"]
+CMD ["sh", "-c", "pnpm --filter @questbot/database db:push && pnpm --filter @duckorganization/questbot start"]

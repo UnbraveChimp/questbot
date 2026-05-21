@@ -1,4 +1,4 @@
-import { prisma } from '@quest/database';
+import { prisma } from '@questbot/database';
 
 export type ConfessionContext = {
 	guildId: string;

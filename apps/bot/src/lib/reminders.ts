@@ -1,4 +1,4 @@
-import { prisma } from '@quest/database';
+import { prisma } from '@questbot/database';
 import { LIMITS_ENABLED, LimitError } from './limits.js';
 
 export async function createReminder(

@@ -11,7 +11,11 @@
 		"outDir": "dist",
 		"skipLibCheck": true,
 		"incremental": false,
-		"tsBuildInfoFile": null
+		"tsBuildInfoFile": null,
+		"paths": {
+			"#lib/*": ["./src/lib/*"],
+			"#utils/*": ["./src/util/*"]
+		}
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist", "prisma.config.ts", "generated"]

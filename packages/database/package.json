@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/package.json",
-	"name": "@quest/database",
+	"name": "@questbot/database",
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",

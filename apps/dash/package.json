@@ -1,5 +1,5 @@
 {
-  "name": "@quest/dash",
+  "name": "@questbot/dash",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
-    "@quest/database": "workspace:*",
+    "@questbot/database": "workspace:*",
     "@react-router/node": "7.15.0",
     "@react-router/serve": "7.15.0",
     "better-auth": "^1.6.11",

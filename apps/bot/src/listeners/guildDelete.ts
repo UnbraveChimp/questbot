@@ -1,6 +1,6 @@
 import { Listener } from '@sapphire/framework';
 import { EmbedBuilder, Events, type Guild } from 'discord.js';
-import { prisma } from '@quest/database';
+import { prisma } from '@questbot/database';
 
 export class GuildDeleteListener extends Listener<typeof Events.GuildDelete> {
 	public constructor(context: Listener.LoaderContext, options: Listener.Options) {
