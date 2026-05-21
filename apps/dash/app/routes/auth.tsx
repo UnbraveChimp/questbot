@@ -16,7 +16,7 @@ export default function Auth() {
         <button
           type="button"
           onClick={() => authClient.signIn.social({ provider: "discord", callbackURL: "/dashboard" })}
-          className="flex w-full items-center justify-center gap-3 rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 active:bg-indigo-700"
+          className="flex w-full items-center justify-center gap-3 rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 cursor-pointer active:bg-indigo-700"
         >
           <DiscordIcon />
           Sign in with Discord
