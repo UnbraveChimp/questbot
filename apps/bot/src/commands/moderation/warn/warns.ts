@@ -57,6 +57,6 @@ export class WarnsCommand extends Command {
 
 		const content = `${emojis.rightArrow1} ${active.length} active warn(s) for <@${targetMember.user.id}>:\n${lines.join('\n')}`;
 
-		await interaction.reply({ content });
+		await interaction.reply({ content, flags: MessageFlags.Ephemeral });
 	}
 }
