@@ -1,4 +1,4 @@
-import { prisma } from './prisma.js';
+import { prisma } from '@quest/database';
 import { Guild, PermissionFlagsBits, Client } from 'discord.js';
 
 export async function createBan(

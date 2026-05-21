@@ -1,4 +1,4 @@
-import { prisma } from './prisma.js';
+import { prisma } from '@quest/database';
 
 export async function createTicket(guildId: string, guildName: string, userId: string, reason: string) {
 	return prisma.$transaction(async (tx) => {

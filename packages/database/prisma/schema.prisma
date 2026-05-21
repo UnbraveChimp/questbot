@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Server {
+  id             String   @id
+  name           String
+  blacklisted    Boolean  @default(false)
+  nextTicketNumber Int    @default(1)
+  settings       Json     @default("{}")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  warns          Warn[]
+  mutes          Mute[]
+  bans           Ban[]
+  reminders      Reminder[]
+  tickets        Ticket[]
+  autoroles      AutoRole[]
+  automods       AutoMod[]
+  confessions    Confession[]
+
+  @@map("server")
+}
+
+model Warn {
+  id          String    @id @default(cuid())
+  guildId     String
+  userId      String
+  moderatorId String
+  reason      String?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  server      Server    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId, userId])
+  @@map("warns")
+}
+
+model Mute {
+  id        String   @id @default(cuid())
+  guildId   String
+  userId    String
+  reason    String?
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+
+  server    Server    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, userId])
+  @@index([expiresAt])
+}
+
+model Ban {
+  id        String   @id @default(cuid())
+  guildId   String
+  userId    String
+  reason    String?
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+
+  server    Server    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, userId])
+  @@index([expiresAt])
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  guildId   String?
+  userId    String
+  channelId String?
+  message   String
+  remindAt  DateTime
+  createdAt DateTime @default(now())
+
+  server    Server?  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([remindAt])
+  @@index([userId])
+}
+
+model Ticket {
+  id           String    @id @default(cuid())
+  guildId      String
+  ticketNumber Int
+  channelId    String?  @unique
+  userId       String
+  reason       String?
+  createdAt    DateTime  @default(now())
+
+  server      Server    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, ticketNumber])
+  @@index([guildId, userId])
+  @@map("tickets")
+}
+
+model AutoRole {
+  id           String    @id @default(cuid())
+  guildId      String
+  roleId       String
+  botRole      Boolean?
+  createdAt    DateTime  @default(now())
+
+  server      Server    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, roleId])
+  @@index([guildId])
+  @@map("autoroles")
+}
+
+model AutoMod {
+  id           String    @id @default(cuid())
+  guildId      String
+  word         String
+  createdAt    DateTime  @default(now())
+
+  server      Server    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, word])
+  @@index([guildId])
+  @@map("automods")
+}
+
+model Confession {
+  messageId String   @id
+  guildId   String
+  channelId String
+  threadId  String
+  creatorId String?
+  createdAt DateTime @default(now())
+
+  server    Server   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("confessions")
+}
+
+model ConfessionBlacklist {
+  userId    String   @id
+  reason    String?
+  createdAt DateTime @default(now())
+  createdBy String
+}

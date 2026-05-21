@@ -1,0 +1,27 @@
+{
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "@quest/database",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"build": "prisma generate && tsc",
+		"db:push": "prisma db push",
+		"db:generate": "prisma generate",
+		"postinstall": "prisma generate"
+	},
+	"dependencies": {
+		"@prisma/adapter-pg": "^7.8.0",
+		"@prisma/client": "^7.8.0",
+		"prisma": "^7.8.0"
+	},
+	"devDependencies": {
+		"typescript": "~6.0.3"
+	}
+}
