@@ -2,10 +2,9 @@
 
 ## Supported Versions
 
-| Version   | Supported          |
-| --------- | ------------------ |
-| 1.1.5 <   | :white_check_mark: |
-| < 1.1.5   | :x:                |
+| Version      | Supported          |
+| ------------ | ------------------ |
+| Latest Tag   | :white_check_mark: |
 
 ## Unsupported types of vulnerabilities
 

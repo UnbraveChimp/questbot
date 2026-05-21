@@ -1,19 +1,11 @@
 import { Command } from '@sapphire/framework';
-import { AttachmentBuilder, MessageFlags } from 'discord.js';
+import { AttachmentBuilder } from 'discord.js';
 import sharp from 'sharp';
 import { emojis } from '#utils/emoji.js';
+import { safeFetch, SafeFetchError } from '#lib/safeFetch.js';
 
 const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 const MAX_SIZE = 20 * 1024 * 1024;
-
-function isSafeUrl(raw: string): boolean {
-	let url: URL;
-	try { url = new URL(raw); } catch { return false; }
-	if (url.protocol !== 'https:') return false;
-	const host = url.hostname;
-	if (/^(localhost|127\.|0\.0\.0\.0|::1|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.)/.test(host)) return false;
-	return true;
-}
 
 export class ToGifCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -34,23 +26,14 @@ export class ToGifCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		const url = interaction.options.getString('url', true);
 
-		if (!isSafeUrl(url)) {
-			await interaction.reply({ content: `${emojis.rightArrow1} URL not valid, HTTPS required.`, flags: MessageFlags.Ephemeral });
-			return;
-		}
-
 		await interaction.deferReply();
 
-		let response: Response;
+		let response;
 		try {
-			response = await fetch(url);
-		} catch {
-			await interaction.editReply(`${emojis.rightArrow1} Failed to fetch the URL.`);
-			return;
-		}
-
-		if (!isSafeUrl(response.url)) {
-			await interaction.editReply(`${emojis.rightArrow1} Redirected to a blocked URL.`);
+			response = await safeFetch(url);
+		} catch (err) {
+			const msg = err instanceof SafeFetchError ? err.message : 'Failed to fetch the URL.';
+			await interaction.editReply(`${emojis.rightArrow1} ${msg}`);
 			return;
 		}
 
@@ -80,7 +63,7 @@ export class ToGifCommand extends Command {
 
 		let gifBuffer: Buffer;
 		try {
-			gifBuffer = await sharp(inputBuffer).gif().toBuffer();
+			gifBuffer = await sharp(inputBuffer, { failOn: 'error' }).gif().toBuffer();
 		} catch {
 			await interaction.editReply(`${emojis.rightArrow1} Failed to convert the image to GIF.`);
 			return;
