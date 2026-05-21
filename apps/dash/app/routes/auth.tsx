@@ -1,13 +1,10 @@
+import { authClient } from "~/utils/auth/client"
+
 export function meta() {
   return [
     { title: "Sign In — Quest" },
     { name: "description", content: "Sign in to Quest Dashboard" },
   ];
-}
-
-export async function action() {
-  // uhh add auth logic
-  return null;
 }
 
 export default function Auth() {
@@ -16,12 +13,14 @@ export default function Auth() {
       <div>
         <h1 className="text-2xl font-bold text-black mb-8 text-center">Quest Dashboard</h1>
 
-        <form method="post">
-          <button type="submit" className="flex w-full items-center justify-center gap-3 rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 active:bg-indigo-700">
-            <DiscordIcon />
-            Sign in with Discord
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={() => authClient.signIn.social({ provider: "discord", callbackURL: "/dashboard" })}
+          className="flex w-full items-center justify-center gap-3 rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 active:bg-indigo-700"
+        >
+          <DiscordIcon />
+          Sign in with Discord
+        </button>
 
         <p className="mt-2 text-sm text-gray-500 text-center">Sign in to continue</p>
       </div>

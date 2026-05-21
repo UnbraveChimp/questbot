@@ -3,12 +3,18 @@
   "globalDependencies": [".env", "pnpm-lock.yaml"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["db:push", "^build"],
       "outputs": ["dist/**", "build/**"]
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "dependsOn": ["^build"]
+    },
+    "start": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^build"]
     },
     "lint": {
       "outputs": [],
