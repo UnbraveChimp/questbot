@@ -1,8 +1,9 @@
 import { Command } from '@sapphire/framework';
-import { MessageFlags, PermissionFlagsBits } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits } from 'discord.js';
 import { createAutoRole, getAutoRole, getAutoRoles, removeAutoRole } from '#lib/autorole.js';
 import { getQuestUnlimitedPurchaseComponents, LimitError } from '#lib/limits.js';
 import { emojis } from '#utils/emoji.js';
+import { awaitMessageComponentSafe } from '#utils/collectors.js';
 
 export class AutoRoleCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -162,19 +163,72 @@ export class AutoRoleCommand extends Command {
 				return;
 			}
 
-			const autoRoleList = autoRoles
-				.map((autoRole) => {
-					const role = interaction.guild?.roles.cache.get(autoRole.roleId);
-					const roleName = role ? `<@&${role.id}>` : `Unknown Role (${autoRole.roleId})`;
-					const botRoleText = autoRole.botRole ? ' (Bot Role)' : '';
-					return `${emojis.rightArrow1} ${roleName}${botRoleText}`;
-				})
-				.join('\n');
+			const totalPages = Math.ceil(autoRoles.length / 10);
+			let page = 0;
 
-			await interaction.reply({
-				content: `**Auto Roles:**\n${autoRoleList}`,
+			const buildContent = (page: number) => {
+				const slice = autoRoles.slice(page * 10, (page + 1) * 10);
+				const roleList = slice
+					.map((autoRole) => {
+						const role = interaction.guild?.roles.cache.get(autoRole.roleId);
+						const roleName = role ? `<@&${role.id}>` : `Unknown Role (${autoRole.roleId})`;
+						const botRoleText = autoRole.botRole ? ' (Bot Role)' : '';
+						return `${emojis.rightArrow1} ${roleName}${botRoleText}`;
+					})
+					.join('\n');
+				return `**Auto Roles** (Page ${page + 1}/${totalPages}):\n${roleList}`;
+			};
+
+			const buildRow = (page: number) =>
+				new ActionRowBuilder<ButtonBuilder>().addComponents(
+					new ButtonBuilder()
+						.setCustomId('prev')
+						.setLabel('<')
+						.setStyle(ButtonStyle.Primary)
+						.setDisabled(page === 0),
+					new ButtonBuilder()
+						.setCustomId('next')
+						.setLabel('>')
+						.setStyle(ButtonStyle.Primary)
+						.setDisabled(page >= totalPages - 1),
+				);
+
+			if (totalPages === 1) {
+				await interaction.reply({
+					content: buildContent(0),
+					flags: MessageFlags.Ephemeral,
+				});
+				return;
+			}
+
+			const response = await interaction.reply({
+				content: buildContent(page),
+				components: [buildRow(page)],
 				flags: MessageFlags.Ephemeral,
+				withResponse: true,
 			});
+
+			const collectorFilter = (i: { user: { id: string } }) => i.user.id === interaction.user.id;
+
+			while (true) {
+				const btn = await awaitMessageComponentSafe(response.resource!.message!, {
+					filter: collectorFilter,
+					time: 60_000,
+				});
+
+				if (!btn) {
+					await interaction.editReply({ components: [] });
+					break;
+				}
+
+				if (btn.customId === 'prev') page = Math.max(0, page - 1);
+				if (btn.customId === 'next') page = Math.min(totalPages - 1, page + 1);
+
+				await btn.update({
+					content: buildContent(page),
+					components: [buildRow(page)],
+				});
+			}
 		}
 	}
 }

@@ -1,8 +1,9 @@
 import { Command } from '@sapphire/framework';
-import { MessageFlags, PermissionsBitField } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionsBitField } from 'discord.js';
 import { createAutoMod, DuplicateAutoModError, getAutoMod, getAutoMods, removeAutoMod } from '#lib/automod.js';
 import { getQuestUnlimitedPurchaseComponents, LimitError } from '#lib/limits.js';
 import { emojis } from '#utils/emoji.js';
+import { awaitMessageComponentSafe } from '#utils/collectors.js';
 
 export class AutoModCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -142,11 +143,65 @@ export class AutoModCommand extends Command {
 				return;
 			}
 
-			const wordList = autoMods.map((autoMod) => `${emojis.rightArrow1} ${autoMod.word}`).join('\n');
-			await interaction.reply({
-				content: `**Blocked Words:**\n${wordList}`,
+			const totalPages = Math.ceil(autoMods.length / 10);
+			let page = 0;
+
+			const buildContent = (page: number) => {
+				const slice = autoMods.slice(page * 10, (page + 1) * 10);
+				const wordList = slice.map((autoMod) => `${emojis.rightArrow1} ${autoMod.word}`).join('\n');
+				return `**Blocked Words** (Page ${page + 1}/${totalPages}):\n${wordList}`;
+			};
+
+			const buildRow = (page: number) =>
+				new ActionRowBuilder<ButtonBuilder>().addComponents(
+					new ButtonBuilder()
+						.setCustomId('prev')
+						.setLabel('<')
+						.setStyle(ButtonStyle.Primary)
+						.setDisabled(page === 0),
+					new ButtonBuilder()
+						.setCustomId('next')
+						.setLabel('>')
+						.setStyle(ButtonStyle.Primary)
+						.setDisabled(page >= totalPages - 1),
+				);
+
+			if (totalPages === 1) {
+				await interaction.reply({
+					content: buildContent(0),
+					flags: MessageFlags.Ephemeral,
+				});
+				return;
+			}
+
+			const response = await interaction.reply({
+				content: buildContent(page),
+				components: [buildRow(page)],
 				flags: MessageFlags.Ephemeral,
+				withResponse: true,
 			});
+
+			const collectorFilter = (i: { user: { id: string } }) => i.user.id === interaction.user.id;
+
+			while (true) {
+				const btn = await awaitMessageComponentSafe(response.resource!.message!, {
+					filter: collectorFilter,
+					time: 60_000,
+				});
+
+				if (!btn) {
+					await interaction.editReply({ components: [] });
+					break;
+				}
+
+				if (btn.customId === 'prev') page = Math.max(0, page - 1);
+				if (btn.customId === 'next') page = Math.min(totalPages - 1, page + 1);
+
+				await btn.update({
+					content: buildContent(page),
+					components: [buildRow(page)],
+				});
+			}
 		}
 
 		if (subcommand === 'remove') {
