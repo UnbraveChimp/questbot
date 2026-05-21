@@ -8,6 +8,6 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   ssr: {
-    external: ["@quest/database"],
+    external: ["@questbot/database"],
   },
 });
