@@ -4,6 +4,7 @@
     border-radius: 9999px;
     padding: 0.5rem 1.25rem;
     color: white;
+    -webkit-text-fill-color: white;
     font-weight: 500;
     font-size: 0.875rem;
     border: 1.5px solid transparent;
@@ -40,6 +41,7 @@
     border-radius: 9999px;
     padding: 0.5rem 1.25rem;
     color: var(--color-neutral-700);
+    -webkit-text-fill-color: var(--color-neutral-700);
     font-weight: 500;
     font-size: 0.875rem;
     border: 1.5px solid var(--color-neutral-300);
@@ -63,6 +65,7 @@
 
 .button2:disabled {
     color: var(--color-neutral-400);
+    -webkit-text-fill-color: var(--color-neutral-400);
     border-color: var(--color-neutral-200);
     cursor: not-allowed;
 }
