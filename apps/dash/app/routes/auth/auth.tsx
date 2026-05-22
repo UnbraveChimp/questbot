@@ -2,8 +2,8 @@ import { authClient } from "~/utils/auth/client"
 
 export function meta() {
   return [
-    { title: "Sign In — Quest" },
-    { name: "description", content: "Sign in to Quest Dashboard" },
+    { title: "Sign In | QuestBot" },
+    { name: "description", content: "Sign in to QuestBot Dashboard" },
   ];
 }
 
@@ -11,7 +11,7 @@ export default function Auth() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-white">
       <div>
-        <h1 className="text-2xl font-bold text-black mb-8 text-center">Quest Dashboard</h1>
+        <h1 className="text-2xl font-bold text-black mb-8 text-center">Quest Bot Dashboard</h1>
 
         <button
           type="button"
