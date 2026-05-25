@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 import { TextInputBuilder, TextInputStyle, type ButtonInteraction } from 'discord.js';
 import { getSettings, updateSettings } from '#lib/settings.js';
-import { createTicket, removeTicket, setTicketChannelId } from '#lib/tickets.js';
+import { TicketLimitError, createTicket, removeTicket, setTicketChannelId } from '#lib/tickets.js';
 import { emojis } from '#utils/emoji.js';
 
 export class ButtonHandler extends InteractionHandler {
@@ -82,7 +82,19 @@ export class ButtonHandler extends InteractionHandler {
 			}
 		}
 
-		const ticket = await createTicket(interaction.guild.id, interaction.guild.name, interaction.user.id, reason);
+		let ticket;
+		try {
+			ticket = await createTicket(interaction.guild.id, interaction.guild.name, interaction.user.id, reason);
+		} catch (error) {
+			if (error instanceof TicketLimitError) {
+				await modalSubmit.reply({
+					content: `${emojis.rightArrow2} You can only have 3 open tickets at a time.`,
+					flags: MessageFlags.Ephemeral,
+				});
+				return;
+			}
+			throw error;
+		}
 
 		const permissionOverwrites = [
 			{

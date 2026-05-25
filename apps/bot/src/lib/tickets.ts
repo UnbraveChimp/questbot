@@ -1,7 +1,17 @@
 import { prisma } from './prisma.js';
 
+export class TicketLimitError extends Error {
+	public constructor() {
+		super('You already have 3 open tickets in this server.');
+		this.name = 'TicketLimitError';
+	}
+}
+
 export async function createTicket(guildId: string, guildName: string, userId: string, reason: string) {
 	return prisma.$transaction(async (tx) => {
+		const openCount = await tx.ticket.count({ where: { guildId, userId } });
+		if (openCount >= 3) throw new TicketLimitError();
+
 		await tx.server.upsert({
 			where: { id: guildId },
 			create: { id: guildId, name: guildName },
