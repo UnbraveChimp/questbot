@@ -13,7 +13,7 @@ COPY packages/database/prisma ./packages/database/prisma/
 RUN pnpm install --frozen-lockfile
 
 COPY . .
-RUN pnpm --filter @duckorganization/questbot build
+RUN pnpm turbo run build --filter=@duckorganization/questbot...
 
 FROM node:24-alpine
 WORKDIR /app
