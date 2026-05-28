@@ -12,7 +12,7 @@
 	},
 	"scripts": {
 		"build": "prisma generate && tsc",
-		"db:push": "dotenv -e ../../.env -- prisma db push",
+		"db:push": "prisma db push",
 		"db:generate": "dotenv -e ../../.env -- prisma generate",
 		"postinstall": "prisma generate"
 	},
