@@ -8,14 +8,15 @@ export class NickCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('nick')
 				.setDescription("Change a member's nickname.")
-				.addUserOption((option: any) =>
+        .setDefaultMemberPermission(ManageNicknames)
+				.addUserOption((option) =>
 					option.setName('member').setDescription('Select a member to change their nickname').setRequired(true),
 				)
-				.addStringOption((option: any) => option.setName('nickname').setDescription('Nickname (leave empty to reset)').setMaxLength(32)),
+				.addStringOption((option) => option.setName('nickname').setDescription('Nickname (leave empty to reset)').setMaxLength(32)),
 		);
 	}
 

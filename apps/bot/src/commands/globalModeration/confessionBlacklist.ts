@@ -13,7 +13,7 @@ export class ConfessionBlacklistCommand extends Command {
 			builder
 				.setName('confessionblacklist')
 				.setDescription('Manage the confession blacklist')
-				.setDefaultMemberPermissions(0n)
+				.setDefaultMemberPermissions(0)
 				.setDMPermission(false)
 				.addSubcommand((sub: any) =>
 					sub

@@ -16,21 +16,21 @@ export class AutoRoleCommand extends Command {
 				.setName('autorole')
 				.setDescription('Automatically assign roles to new members!')
 				.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
-				.addSubcommand((sub: any) =>
+				.addSubcommand((subcommand) =>
 					sub
 						.setName('add')
 						.setDescription('Create a new auto role.')
-						.addRoleOption((option: any) =>
+						.addRoleOption((option) =>
 							option.setName('role').setDescription('The role to assign to new members').setRequired(true),
 						)
-						.addBooleanOption((option: any) =>
+						.addBooleanOption((option) =>
 							option
 								.setName('bot_role')
 								.setDescription('Whether this role should be assigned to bots')
 								.setRequired(true),
 						),
 				)
-				.addSubcommand((sub: any) =>
+				.addSubcommand((subcommand) =>
 					sub
 						.setName('remove')
 						.setDescription('Remove an auto role.')
@@ -38,7 +38,7 @@ export class AutoRoleCommand extends Command {
 							option.setName('role').setDescription('The auto role to remove').setAutocomplete(true).setRequired(true).setMaxLength(36),
 						),
 				)
-				.addSubcommand((sub: any) => sub.setName('list').setDescription('List all auto roles.')),
+				.addSubcommand((subcommand) => sub.setName('list').setDescription('List all auto roles.')),
 		);
 	}
 

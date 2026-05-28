@@ -7,7 +7,7 @@ export class BotCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder.setName('bot').setDescription('Get a link to add the bot to your server!'),
 		);
 	}

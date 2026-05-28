@@ -11,11 +11,12 @@ export class SlowmodeCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('slowmode')
 				.setDescription('Set or clear the slowmode for the current channel.')
-				.addStringOption((option: any) =>
+        .setDefaultMemberPermission(ManageChannels)
+				.addStringOption((option) =>
 					option.setName('duration').setDescription('Provide a duration for slowmode, or leave blank to remove it').setMaxLength(20),
 				),
 		);

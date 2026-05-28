@@ -15,7 +15,7 @@ export class SetupTicketsCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('setup-tickets')
 				.setDescription('Post the ticket panel in a channel.')

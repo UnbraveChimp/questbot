@@ -17,15 +17,16 @@ export class BanCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('ban')
 				.setDescription('Ban someone from the discord server.')
-				.addUserOption((option: any) =>
+        .setDefaultMemberPermission(BanMembers)
+				.addUserOption((option) =>
 					option.setName('member').setDescription('Select a member to ban').setRequired(true),
 				)
-				.addStringOption((option: any) => option.setName('reason').setDescription('Provide a reason for their ban').setMaxLength(512))
-				.addStringOption((option: any) =>
+				.addStringOption((option) => option.setName('reason').setDescription('Provide a reason for their ban').setMaxLength(512))
+				.addStringOption((option) =>
 					option.setName('duration').setDescription('Provide a duration for their ban (if needed)').setMaxLength(20),
 				),
 		);

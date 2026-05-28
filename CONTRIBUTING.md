@@ -10,7 +10,7 @@ When committing code you take *full* responsibility for what you are committing.
 
 ## Pull requests
 
-Please submit pull requests to the `dev` branch, unless this is a feature which requires a separate branch.
+Please submit pull requests to a new branch.
 Make sure to test the code you have made before creating a pull request.
 Use conventional commit messages for all commits.
 

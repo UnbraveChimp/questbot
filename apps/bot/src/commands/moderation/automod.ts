@@ -15,23 +15,24 @@ export class AutoModCommand extends Command {
 			builder
 				.setName('automod')
 				.setDescription('Block words from being said!')
-				.addSubcommand((sub: any) =>
+        .setDefaultMemberPermission(0)
+				.addSubcommand((subcommand) =>
 					sub
 						.setName('add')
 						.setDescription('Create a new automod rule.')
-						.addStringOption((option: any) =>
+						.addStringOption((option) =>
 							option.setName('word').setDescription('The word to block').setRequired(true).setMaxLength(100),
 						),
 				)
-				.addSubcommand((sub: any) =>
+				.addSubcommand((subcommand) =>
 					sub
 						.setName('remove')
 						.setDescription('Remove words from the automod list.')
-						.addStringOption((option: any) =>
+						.addStringOption((option) =>
 							option.setName('word').setDescription('The word to remove').setAutocomplete(true).setRequired(true).setMaxLength(36),
 						),
 				)
-				.addSubcommand((sub: any) => sub.setName('list').setDescription('List all blocked words.')),
+				.addSubcommand((subcommand) => sub.setName('list').setDescription('List all blocked words.')),
 		);
 	}
 

@@ -13,11 +13,11 @@ export class ToGifCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('togif')
 				.setDescription('Convert a PNG, JPEG, or WEBP image URL to a GIF.')
-				.addStringOption((option: any) =>
+				.addStringOption((option) =>
 					option.setName('url').setDescription('The image URL to convert.').setRequired(true).setMaxLength(512),
 				),
 		);

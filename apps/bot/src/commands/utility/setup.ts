@@ -76,7 +76,7 @@ export class SetupCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('setup')
 				.setDescription('Guided setup to configure the bot for this server.')

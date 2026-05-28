@@ -16,14 +16,15 @@ export class UnmuteCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('unmute')
 				.setDescription('Unmute someone in the discord server.')
-				.addUserOption((option: any) =>
+        .setDefaultMemberPermission(ModerateMembers)
+				.addUserOption((option) =>
 					option.setName('member').setDescription('Select a member to unmute').setRequired(true),
 				)
-				.addStringOption((option: any) => option.setName('reason').setDescription('Provide a reason for their unmute').setMaxLength(512)),
+				.addStringOption((option) => option.setName('reason').setDescription('Provide a reason for their unmute').setMaxLength(512)),
 		);
 	}
 

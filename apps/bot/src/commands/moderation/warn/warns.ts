@@ -9,11 +9,12 @@ export class WarnsCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('warns')
 				.setDescription('View (someones) warns.')
-				.addUserOption((option: any) => option.setName('member').setDescription('Member to view warns of')),
+        .setDefaultMemberPermission(ModerateMembers)
+				.addUserOption((option) => option.setName('member').setDescription('Member to view warns of')),
 		);
 	}
 

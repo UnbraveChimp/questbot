@@ -15,14 +15,15 @@ export class KickCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('kick')
 				.setDescription('Kick someone from the discord server.')
-				.addUserOption((option: any) =>
+        .setDefaultMemberPermission(KickMembers)
+				.addUserOption((option) =>
 					option.setName('member').setDescription('Select a member to kick').setRequired(true),
 				)
-				.addStringOption((option: any) => option.setName('reason').setDescription('Provide a reason for their kick').setMaxLength(512)),
+				.addStringOption((option) => option.setName('reason').setDescription('Provide a reason for their kick').setMaxLength(512)),
 		);
 	}
 

@@ -20,8 +20,10 @@ export class ConfessCommand extends Command {
 		super(context, { ...options, preconditions: ['devMode'] });
 	}
 
+  // I believe this command still needs some touchups
+
 	public override registerApplicationCommands(_registry: Command.Registry) {
-		_registry.registerChatInputCommand((builder: any) =>
+		_registry.registerChatInputCommand((builder) =>
 			builder.setName('confess').setDescription('Create a confession'),
 		);
 	}

@@ -7,7 +7,7 @@ export class PingCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder.setName('ping').setDescription("Return the bot's latency."),
 		);
 	}

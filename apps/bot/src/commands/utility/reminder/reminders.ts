@@ -9,7 +9,7 @@ export class RemindersCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder.setName('reminders').setDescription('List your current reminders.'),
 		);
 	}

@@ -9,7 +9,7 @@ export class QuestUnlimitedCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder.setName('unlimited').setDescription('Purchase Quest Unlimited!'),
 		);
 	}

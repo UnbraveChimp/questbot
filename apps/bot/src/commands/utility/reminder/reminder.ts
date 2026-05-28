@@ -15,22 +15,22 @@ export class ReminderCommand extends Command {
 			builder
 				.setName('reminder')
 				.setDescription('Set reminders!')
-				.addSubcommand((sub: any) =>
+				.addSubcommand((subcommand) =>
 					sub
 						.setName('add')
 						.setDescription('Set a new reminder.')
-						.addStringOption((option: any) =>
+						.addStringOption((option) =>
 							option.setName('duration').setDescription('When to remind you').setRequired(true).setMaxLength(20),
 						)
-						.addStringOption((option: any) =>
+						.addStringOption((option) =>
 							option.setName('message').setDescription('What to remind you about').setRequired(true).setMaxLength(1000),
 						),
 				)
-				.addSubcommand((sub: any) =>
+				.addSubcommand((subcommand) =>
 					sub
 						.setName('remove')
 						.setDescription('Cancel a reminder.')
-						.addStringOption((option: any) => option.setName('id').setDescription('The reminder ID').setRequired(true).setMaxLength(36)),
+						.addStringOption((option) => option.setName('id').setDescription('The reminder ID').setRequired(true).setMaxLength(36)),
 				),
 		);
 	}

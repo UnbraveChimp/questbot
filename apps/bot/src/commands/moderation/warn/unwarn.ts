@@ -16,14 +16,15 @@ export class UnwarnCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('unwarn')
 				.setDescription('Unwarn someone in the discord server.')
-				.addStringOption((option: any) =>
+        .setDefaultMemberPermission(ModerateMembers)
+				.addStringOption((option) =>
 					option.setName('id').setDescription('The ID of the warn to remove').setRequired(true).setMaxLength(36),
 				)
-				.addStringOption((option: any) =>
+				.addStringOption((option) =>
 					option.setName('reason').setDescription('Provide a reason for removing the warn').setMaxLength(512),
 				),
 		);
