@@ -55,12 +55,12 @@
 	},
 	"imports": {
 		"#utils/*": {
-			"development": "./src/util/*.ts",
-			"default": "./dist/util/*.js"
+			"development": "./src/util/*",
+			"default": "./dist/util/*"
 		},
 		"#lib/*": {
-			"development": "./src/lib/*.ts",
-			"default": "./dist/lib/*.js"
+			"development": "./src/lib/*",
+			"default": "./dist/lib/*"
 		}
 	}
 }
