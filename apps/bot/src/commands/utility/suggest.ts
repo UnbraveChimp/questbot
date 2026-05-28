@@ -1,6 +1,6 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js'
-import { SlashCommandStringOption } from 'discord.js';
+import { SlashCommandStringOption, MessageFlags } from 'discord.js';
 
 export class SuggestCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -33,7 +33,7 @@ export class SuggestCommand extends Command {
       return;
     }
     
-    await interaction.deferReply();
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     try {  
       const response = await fetch(webhook, {
