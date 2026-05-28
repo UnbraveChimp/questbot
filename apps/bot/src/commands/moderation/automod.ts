@@ -15,7 +15,7 @@ export class AutoModCommand extends Command {
 			builder
 				.setName('automod')
 				.setDescription('Block words from being said!')
-        .setDefaultMemberPermission(0)
+        .setDefaultMemberPermissions(0)
 				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
 					subcommand
 						.setName('add')
