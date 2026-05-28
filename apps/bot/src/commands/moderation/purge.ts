@@ -62,7 +62,7 @@ export class PurgeCommand extends Command {
 			return;
 		}
 
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 		await interaction.editReply(`${emojis.rightArrow2} Purging ${amount} messages...`);
 
 		let remaining = amount;
