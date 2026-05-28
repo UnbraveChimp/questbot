@@ -56,11 +56,14 @@ export class SuggestCommand extends Command {
 
       if (response.ok) {
         await interaction.editReply(`${emojis.rightArrow1} Sent!`)
+        return;
       } else {
         await interaction.editReply(`${emojis.rightArrow2} There was an error trying to send your suggestion!`)
+        return;
       }
     } catch {
       await interaction.editReply(`${emojis.rightArrow2} There was an error trying to send your suggestion!`)
+      return;
     }
   }
 }
