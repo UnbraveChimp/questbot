@@ -1,4 +1,4 @@
-import { prisma } from './prisma.js';
+import { prisma } from '@questbot/database';
 
 export class TicketLimitError extends Error {
 	public constructor() {

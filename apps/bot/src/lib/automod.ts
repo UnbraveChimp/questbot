@@ -1,4 +1,4 @@
-import { prisma } from './prisma.js';
+import { prisma } from '@questbot/database';
 import { hasQuestUnlimitedAccess, LIMITS_ENABLED, LimitError } from './limits.js';
 import type { EntitlementManager } from 'discord.js';
 

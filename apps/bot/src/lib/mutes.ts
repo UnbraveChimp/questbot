@@ -1,4 +1,4 @@
-import { prisma } from './prisma.js';
+import { prisma } from '@questbot/database';
 import { Guild } from 'discord.js';
 
 export async function createMute(

@@ -1,5 +1,4 @@
-import { Prisma } from '#prisma/client.js';
-import { prisma } from './prisma.js';
+import { Prisma, prisma } from '@questbot/database';
 
 export type ServerSettings = {
 	welcomePeople: boolean;
