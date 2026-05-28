@@ -12,7 +12,7 @@
 	},
 	"scripts": {
 		"build": "prisma generate && tsc",
-		"db:push": "dotenv -e ../../.env -- prisma db push && dotenv -e ../../.env -- prisma generate",
+		"db:push": "prisma db push",
 		"db:generate": "dotenv -e ../../.env -- prisma generate",
 		"postinstall": "prisma generate"
 	},
@@ -22,7 +22,6 @@
 		"prisma": "^7.8.0"
 	},
 	"devDependencies": {
-		"dotenv-cli": "^11.0.0",
 		"typescript": "~6.0.3"
 	}
 }
