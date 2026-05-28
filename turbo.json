@@ -9,7 +9,7 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["db:push", "^build"]
+      "dependsOn": ["^build"]
     },
     "start": {
       "cache": false,
