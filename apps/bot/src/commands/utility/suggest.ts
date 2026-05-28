@@ -1,10 +1,16 @@
-import { Command } from '@sapphire/framework';
+import { Command, BucketScope } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js'
 import { SlashCommandStringOption, MessageFlags } from 'discord.js';
 
 export class SuggestCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
-    super(context, { ...options, preconditions: ['devMode'] });
+    super(context, { 
+      ...options, 
+      preconditions: ['devMode'],
+      cooldownDelay: 60_000,
+      cooldownLimit: 1,
+      cooldownScope: BucketScope.User,
+    });
   }
 
   public override registerApplicationCommands(registry: Command.Registry) {
