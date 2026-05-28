@@ -6,6 +6,9 @@ import {
 	GuildMember,
 	MessageFlags,
 	PermissionsBitField,
+  PermissionFlagsBits,
+  SlashCommandUserOption,
+  SlashCommandStringOption,
 } from 'discord.js';
 import ms, { type StringValue } from 'ms';
 import { applyBan, createBan } from '#lib/bans.js';
@@ -21,12 +24,12 @@ export class BanCommand extends Command {
 			builder
 				.setName('ban')
 				.setDescription('Ban someone from the discord server.')
-        .setDefaultMemberPermission(BanMembers)
-				.addUserOption((option) =>
+        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+				.addUserOption((option: SlashCommandUserOption) =>
 					option.setName('member').setDescription('Select a member to ban').setRequired(true),
 				)
-				.addStringOption((option) => option.setName('reason').setDescription('Provide a reason for their ban').setMaxLength(512))
-				.addStringOption((option) =>
+				.addStringOption((option: SlashCommandStringOption) => option.setName('reason').setDescription('Provide a reason for their ban').setMaxLength(512))
+				.addStringOption((option: SlashCommandStringOption) =>
 					option.setName('duration').setDescription('Provide a duration for their ban (if needed)').setMaxLength(20),
 				),
 		);

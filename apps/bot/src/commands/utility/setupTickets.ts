@@ -20,7 +20,7 @@ export class SetupTicketsCommand extends Command {
 				.setName('setup-tickets')
 				.setDescription('Post the ticket panel in a channel.')
 				.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-				.addChannelOption((option: any) =>
+				.addChannelOption((option) =>
 					option
 						.setName('channel')
 						.setDescription('The channel where the ticket panel should be posted')

@@ -1,5 +1,5 @@
 import { Command } from '@sapphire/framework';
-import { MessageFlags, PermissionsBitField } from 'discord.js';
+import { MessageFlags, PermissionsBitField, PermissionFlagsBits, SlashCommandStringOption } from 'discord.js';
 import ms, { type StringValue } from 'ms';
 import { emojis } from '#utils/emoji.js';
 
@@ -15,8 +15,8 @@ export class SlowmodeCommand extends Command {
 			builder
 				.setName('slowmode')
 				.setDescription('Set or clear the slowmode for the current channel.')
-        .setDefaultMemberPermission(ManageChannels)
-				.addStringOption((option) =>
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+				.addStringOption((option: SlashCommandStringOption) =>
 					option.setName('duration').setDescription('Provide a duration for slowmode, or leave blank to remove it').setMaxLength(20),
 				),
 		);

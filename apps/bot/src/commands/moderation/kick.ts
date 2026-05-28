@@ -6,6 +6,9 @@ import {
 	GuildMember,
 	MessageFlags,
 	PermissionsBitField,
+  PermissionFlagsBits,
+  SlashCommandUserOption,
+  SlashCommandStringOption,
 } from 'discord.js';
 import { emojis } from '#utils/emoji.js';
 
@@ -19,11 +22,11 @@ export class KickCommand extends Command {
 			builder
 				.setName('kick')
 				.setDescription('Kick someone from the discord server.')
-        .setDefaultMemberPermission(KickMembers)
-				.addUserOption((option) =>
+        .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
+				.addUserOption((option: SlashCommandUserOption) =>
 					option.setName('member').setDescription('Select a member to kick').setRequired(true),
 				)
-				.addStringOption((option) => option.setName('reason').setDescription('Provide a reason for their kick').setMaxLength(512)),
+				.addStringOption((option: SlashCommandStringOption) => option.setName('reason').setDescription('Provide a reason for their kick').setMaxLength(512)),
 		);
 	}
 

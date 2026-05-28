@@ -6,6 +6,8 @@ import {
 	GuildMember,
 	MessageFlags,
 	PermissionsBitField,
+  PermissionFlagsBits,
+  SlashCommandStringOption
 } from 'discord.js';
 import { getBan, removeBan } from '#lib/bans.js';
 import { emojis } from '#utils/emoji.js';
@@ -20,11 +22,11 @@ export class UnbanCommand extends Command {
 			builder
 				.setName('unban')
 				.setDescription('Unban someone from the discord server.')
-        .setDefaultMemberPermission(BanMembers)
+        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
 				.addUserOption((option) =>
 					option.setName('member').setDescription('The member to unban').setRequired(true),
 				)
-				.addStringOption((option) => option.setName('reason').setDescription('Provide a reason for their unban').setMaxLength(512)),
+				.addStringOption((option: SlashCommandStringOption) => option.setName('reason').setDescription('Provide a reason for their unban').setMaxLength(512)),
 		);
 	}
 

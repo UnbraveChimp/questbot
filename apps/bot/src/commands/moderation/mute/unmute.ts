@@ -6,6 +6,9 @@ import {
 	GuildMember,
 	MessageFlags,
 	PermissionsBitField,
+  PermissionFlagsBits,
+  SlashCommandUserOption,
+  SlashCommandStringOption
 } from 'discord.js';
 import { removeMute } from '#lib/mutes.js';
 import { emojis } from '#utils/emoji.js';
@@ -20,11 +23,11 @@ export class UnmuteCommand extends Command {
 			builder
 				.setName('unmute')
 				.setDescription('Unmute someone in the discord server.')
-        .setDefaultMemberPermission(ModerateMembers)
-				.addUserOption((option) =>
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+				.addUserOption((option: SlashCommandUserOption) =>
 					option.setName('member').setDescription('Select a member to unmute').setRequired(true),
 				)
-				.addStringOption((option) => option.setName('reason').setDescription('Provide a reason for their unmute').setMaxLength(512)),
+				.addStringOption((option: SlashCommandStringOption) => option.setName('reason').setDescription('Provide a reason for their unmute').setMaxLength(512)),
 		);
 	}
 

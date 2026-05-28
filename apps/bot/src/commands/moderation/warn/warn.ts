@@ -7,6 +7,7 @@ import {
 	EmbedBuilder,
 	GuildMember,
 	MessageFlags,
+  PermissionFlagsBits,
 	PermissionsBitField,
 } from 'discord.js';
 import ms, { type StringValue } from 'ms';
@@ -24,7 +25,7 @@ export class WarnCommand extends Command {
 			builder
 				.setName('warn')
 				.setDescription('Warn someone in the discord server.')
-        .setDefaultMemberPermission(ModerateMembers)
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
 				.addUserOption((option) =>
 					option.setName('member').setDescription('Select a member to warn').setRequired(true),
 				)

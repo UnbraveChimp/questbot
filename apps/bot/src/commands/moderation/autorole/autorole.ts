@@ -1,5 +1,5 @@
 import { Command } from '@sapphire/framework';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, SlashCommandRoleOption, SlashCommandBooleanOption, SlashCommandStringOption, SlashCommandSubcommandBuilder } from 'discord.js';
 import { createAutoRole, getAutoRole, getAutoRoles, removeAutoRole } from '#lib/autorole.js';
 import { getQuestUnlimitedPurchaseComponents, LimitError } from '#lib/limits.js';
 import { emojis } from '#utils/emoji.js';
@@ -16,29 +16,29 @@ export class AutoRoleCommand extends Command {
 				.setName('autorole')
 				.setDescription('Automatically assign roles to new members!')
 				.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
-				.addSubcommand((subcommand) =>
-					sub
+				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
+					subcommand
 						.setName('add')
 						.setDescription('Create a new auto role.')
-						.addRoleOption((option) =>
+						.addRoleOption((option: SlashCommandRoleOption) =>
 							option.setName('role').setDescription('The role to assign to new members').setRequired(true),
 						)
-						.addBooleanOption((option) =>
+						.addBooleanOption((option: SlashCommandBooleanOption) =>
 							option
 								.setName('bot_role')
 								.setDescription('Whether this role should be assigned to bots')
 								.setRequired(true),
 						),
 				)
-				.addSubcommand((subcommand) =>
-					sub
+				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
+					subcommand
 						.setName('remove')
 						.setDescription('Remove an auto role.')
-						.addStringOption((option: any) =>
+						.addStringOption((option: SlashCommandStringOption) =>
 							option.setName('role').setDescription('The auto role to remove').setAutocomplete(true).setRequired(true).setMaxLength(36),
 						),
 				)
-				.addSubcommand((subcommand) => sub.setName('list').setDescription('List all auto roles.')),
+				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) => subcommand.setName('list').setDescription('List all auto roles.')),
 		);
 	}
 

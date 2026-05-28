@@ -1,5 +1,5 @@
 import { Command } from '@sapphire/framework';
-import { AttachmentBuilder } from 'discord.js';
+import { AttachmentBuilder, SlashCommandStringOption } from 'discord.js';
 import sharp from 'sharp';
 import { emojis } from '#utils/emoji.js';
 import { safeFetch, SafeFetchError } from '#lib/safeFetch.js';
@@ -17,7 +17,7 @@ export class ToGifCommand extends Command {
 			builder
 				.setName('togif')
 				.setDescription('Convert a PNG, JPEG, or WEBP image URL to a GIF.')
-				.addStringOption((option) =>
+				.addStringOption((option: SlashCommandStringOption) =>
 					option.setName('url').setDescription('The image URL to convert.').setRequired(true).setMaxLength(512),
 				),
 		);

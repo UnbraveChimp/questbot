@@ -1,5 +1,5 @@
 import { Command } from '@sapphire/framework';
-import { GuildMember, MessageFlags, PermissionsBitField } from 'discord.js';
+import { GuildMember, MessageFlags, PermissionsBitField, SlashCommandStringOption, SlashCommandUserOption, PermissionFlagsBits } from 'discord.js';
 import { emojis } from '#utils/emoji.js';
 
 export class NickCommand extends Command {
@@ -12,11 +12,11 @@ export class NickCommand extends Command {
 			builder
 				.setName('nick')
 				.setDescription("Change a member's nickname.")
-        .setDefaultMemberPermission(ManageNicknames)
-				.addUserOption((option) =>
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageNicknames)
+				.addUserOption((option: SlashCommandUserOption) =>
 					option.setName('member').setDescription('Select a member to change their nickname').setRequired(true),
 				)
-				.addStringOption((option) => option.setName('nickname').setDescription('Nickname (leave empty to reset)').setMaxLength(32)),
+				.addStringOption((option: SlashCommandStringOption) => option.setName('nickname').setDescription('Nickname (leave empty to reset)').setMaxLength(32)),
 		);
 	}
 

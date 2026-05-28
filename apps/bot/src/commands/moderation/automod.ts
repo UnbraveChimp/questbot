@@ -1,5 +1,5 @@
 import { Command } from '@sapphire/framework';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionsBitField } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionsBitField, SlashCommandSubcommandBuilder, SlashCommandStringOption } from 'discord.js';
 import { createAutoMod, DuplicateAutoModError, getAutoMod, getAutoMods, removeAutoMod } from '#lib/automod.js';
 import { getQuestUnlimitedPurchaseComponents, LimitError } from '#lib/limits.js';
 import { emojis } from '#utils/emoji.js';
@@ -16,23 +16,23 @@ export class AutoModCommand extends Command {
 				.setName('automod')
 				.setDescription('Block words from being said!')
         .setDefaultMemberPermission(0)
-				.addSubcommand((subcommand) =>
-					sub
+				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
+					subcommand
 						.setName('add')
 						.setDescription('Create a new automod rule.')
-						.addStringOption((option) =>
+						.addStringOption((option: SlashCommandStringOption) =>
 							option.setName('word').setDescription('The word to block').setRequired(true).setMaxLength(100),
 						),
 				)
-				.addSubcommand((subcommand) =>
-					sub
+				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
+					subcommand
 						.setName('remove')
 						.setDescription('Remove words from the automod list.')
-						.addStringOption((option) =>
+						.addStringOption((option: SlashCommandStringOption) =>
 							option.setName('word').setDescription('The word to remove').setAutocomplete(true).setRequired(true).setMaxLength(36),
 						),
 				)
-				.addSubcommand((subcommand) => sub.setName('list').setDescription('List all blocked words.')),
+				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) => subcommand.setName('list').setDescription('List all blocked words.')),
 		);
 	}
 

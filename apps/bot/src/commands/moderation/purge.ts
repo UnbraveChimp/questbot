@@ -1,8 +1,6 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
-import { MessageFlags, PermissionsBitField } from 'discord.js';
-
-const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
+import { MessageFlags, PermissionsBitField, SlashCommandIntegerOption } from 'discord.js';
 
 export class PurgeCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -10,11 +8,11 @@ export class PurgeCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('purge')
 				.setDescription('Purge messages up to 14d old from a channel.')
-				.addIntegerOption((option: any) =>
+				.addIntegerOption((option: SlashCommandIntegerOption) =>
 					option
 						.setName('amount')
 						.setDescription('The number of messages to purge')
@@ -61,7 +59,7 @@ export class PurgeCommand extends Command {
 		try {
 			await channel.bulkDelete(amount);
 
-			await interaction.editReply(`${emojis.rightArrow1} Successfully purged ${deletedTotal} messages.`);
+			await interaction.editReply(`${emojis.rightArrow1} Successfully purged ${amount} messages.`);
 		} catch (err) {
 			console.error(err);
 			await interaction.editReply({

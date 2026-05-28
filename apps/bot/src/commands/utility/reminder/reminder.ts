@@ -1,5 +1,5 @@
 import { Command } from '@sapphire/framework';
-import { MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { MessageFlags, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandStringOption } from 'discord.js';
 import ms, { type StringValue } from 'ms';
 import { createReminder, getReminder, removeReminder } from '#lib/reminders.js';
 import { LimitError } from '#lib/limits.js';
@@ -15,22 +15,22 @@ export class ReminderCommand extends Command {
 			builder
 				.setName('reminder')
 				.setDescription('Set reminders!')
-				.addSubcommand((subcommand) =>
-					sub
+				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
+					subcommand
 						.setName('add')
 						.setDescription('Set a new reminder.')
-						.addStringOption((option) =>
+						.addStringOption((option: SlashCommandStringOption) =>
 							option.setName('duration').setDescription('When to remind you').setRequired(true).setMaxLength(20),
 						)
-						.addStringOption((option) =>
+						.addStringOption((option: SlashCommandStringOption) =>
 							option.setName('message').setDescription('What to remind you about').setRequired(true).setMaxLength(1000),
 						),
 				)
-				.addSubcommand((subcommand) =>
-					sub
+				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
+					subcommand
 						.setName('remove')
 						.setDescription('Cancel a reminder.')
-						.addStringOption((option) => option.setName('id').setDescription('The reminder ID').setRequired(true).setMaxLength(36)),
+						.addStringOption((option: SlashCommandStringOption) => option.setName('id').setDescription('The reminder ID').setRequired(true).setMaxLength(36)),
 				),
 		);
 	}
