@@ -36,7 +36,7 @@ export class MessageUpdateListener extends Listener {
 			.setTitle('Message Edited')
 			.setColor(0xfac898)
 			.addFields(
-				{ name: 'Channel', value: newMsg.channel?.toString() ?? 'Unknown', inline: true },
+				{ name: 'Message', value: newMsg.url ?? 'Unknown', inline: true },
 				{ name: 'Author', value: newMsg.author?.tag ?? oldMsg?.author?.tag ?? 'Unknown', inline: true },
 				{ name: 'Before', value: beforeValue },
 				{ name: 'After', value: afterValue },
@@ -47,3 +47,4 @@ export class MessageUpdateListener extends Listener {
 		await logEmbed(guild, embed);
 	}
 }
+
