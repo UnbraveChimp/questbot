@@ -21,11 +21,15 @@ export async function createAutoMod(
 
 	const hasUnlimitedAccess = entitlements ? await hasQuestUnlimitedAccess(entitlements, guildId) : false;
 
-	if (LIMITS_ENABLED && !hasUnlimitedAccess) {
+	if (LIMITS_ENABLED) {
 		const autoModCount = await prisma.autoMod.count({ where: { guildId } });
 
-		if (autoModCount >= 10) {
+		if (autoModCount >= 10 && !hasUnlimitedAccess) {
 			throw new LimitError('A guild can only have up to 10 automod rules.', true);
+		}
+
+		if (autoModCount >= 250 && hasUnlimitedAccess) {
+			throw new LimitError('A guild with unlimited access can only have up to 250 automod rules. This is to combat abuse.');
 		}
 	}
 

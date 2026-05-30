@@ -11,11 +11,15 @@ export async function createAutoRole(
 ) {
 	const hasUnlimitedAccess = entitlements ? await hasQuestUnlimitedAccess(entitlements, guildId) : false;
 
-	if (LIMITS_ENABLED && !hasUnlimitedAccess) {
+	if (LIMITS_ENABLED) {
 		const autoRoleCount = await prisma.autoRole.count({ where: { guildId } });
 
-		if (autoRoleCount >= 5) {
-			throw new LimitError('A guild can only have up to 5 auto roles.', true);
+		if (autoRoleCount >= 15 && !hasUnlimitedAccess) {
+			throw new LimitError('A guild can only have up to 15 auto roles.', true);
+		}
+
+		if (autoRoleCount >= 250 && hasUnlimitedAccess) {
+			throw new LimitError('A guild with unlimited access can only have up to 250 auto roles. This is to combat abuse.');
 		}
 	}
 

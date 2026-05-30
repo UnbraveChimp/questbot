@@ -11,7 +11,7 @@ export class AutoRoleCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('autorole')
 				.setDescription('Automatically assign roles to new members!')
