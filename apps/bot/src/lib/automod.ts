@@ -29,7 +29,9 @@ export async function createAutoMod(
 		}
 
 		if (autoModCount >= 250 && hasUnlimitedAccess) {
-			throw new LimitError('A guild with unlimited access can only have up to 250 automod rules. This is to combat abuse.');
+			throw new LimitError(
+				'A guild with unlimited access can only have up to 250 automod rules. This is to combat abuse.',
+			);
 		}
 	}
 

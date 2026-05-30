@@ -1,5 +1,16 @@
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, ChannelType, AttachmentBuilder } from 'discord.js';
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	MessageFlags,
+	ChannelType,
+	AttachmentBuilder,
+	ModalBuilder,
+	TextInputBuilder,
+	TextInputStyle,
+	LabelBuilder,
+} from 'discord.js';
 import type { ButtonInteraction, TextChannel } from 'discord.js';
 import { emojis } from '#utils/emoji.js';
 import { getTicketId, removeTicket } from '#lib/tickets.js';
@@ -119,10 +130,51 @@ export class ButtonHandler extends InteractionHandler {
 			return;
 		}
 
-		await interaction.update({
+		const reasonInput = new TextInputBuilder()
+			.setCustomId('ticket-close-reason')
+			.setStyle(TextInputStyle.Paragraph)
+			.setRequired(false)
+			.setMaxLength(1_000);
+
+		const reasonLabel = new LabelBuilder().setLabel('Reason for closing').setTextInputComponent(reasonInput);
+
+		const modal = new ModalBuilder()
+			.setCustomId('close-ticket-modal')
+			.setTitle('Close Ticket')
+			.addLabelComponents(reasonLabel);
+
+		await interaction.showModal(modal);
+
+		const modalSubmit = await interaction
+			.awaitModalSubmit({
+				filter: (modalInteraction) =>
+					modalInteraction.customId === 'close-ticket-modal' && modalInteraction.user.id === interaction.user.id,
+				time: 60_000,
+			})
+			.catch(() => null);
+
+		if (!modalSubmit) return;
+
+		await modalSubmit.reply({
 			content: `${emojis.rightArrow2} Closing ticket...`,
-			components: [],
+			flags: MessageFlags.Ephemeral,
 		});
+
+		const rawReason = modalSubmit.fields.getTextInputValue('ticket-close-reason');
+		const reason = rawReason && rawReason.trim() !== '' ? rawReason.trim() : 'No reason provided';
+
+		if (channel.isTextBased()) {
+			await channel.send({
+				content: [
+					`This ticket will be closed shortly.`,
+					``,
+					`**Closed by:** <@${interaction.user.id}>`,
+					`**Reason:** ${reason}`,
+				].join('\n'),
+			});
+		}
+
+		await new Promise((resolve) => setTimeout(resolve, 5000));
 
 		const ticket = await getTicketId(interaction.guild.id, channel.id);
 
@@ -156,7 +208,7 @@ export class ButtonHandler extends InteractionHandler {
 				await removeTicket(ticket.id);
 			}
 
-			await channel.delete(`Ticket closed by ${interaction.user.tag}.`);
+			await channel.delete(`Ticket closed by ${interaction.user.tag}. Reason: ${reason}`);
 		} catch (err) {
 			console.log(err);
 		}

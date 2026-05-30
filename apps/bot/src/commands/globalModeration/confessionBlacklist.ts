@@ -1,5 +1,10 @@
 import { Command } from '@sapphire/framework';
-import { MessageFlags, SlashCommandUserOption, SlashCommandStringOption, SlashCommandSubcommandBuilder } from 'discord.js';
+import {
+	MessageFlags,
+	SlashCommandUserOption,
+	SlashCommandStringOption,
+	SlashCommandSubcommandBuilder,
+} from 'discord.js';
 import { addConfessionBlacklist, removeConfessionBlacklist, isConfessionBlacklisted } from '#lib/confessions.js';
 import { emojis } from '#utils/emoji.js';
 
@@ -19,20 +24,28 @@ export class ConfessionBlacklistCommand extends Command {
 					subcommand
 						.setName('add')
 						.setDescription('Blacklist a user from making confessions')
-						.addUserOption((opt: SlashCommandUserOption) => opt.setName('user').setDescription('User to blacklist').setRequired(true))
-						.addStringOption((opt: SlashCommandStringOption) => opt.setName('reason').setDescription('Reason').setMaxLength(512).setRequired(false)),
+						.addUserOption((opt: SlashCommandUserOption) =>
+							opt.setName('user').setDescription('User to blacklist').setRequired(true),
+						)
+						.addStringOption((opt: SlashCommandStringOption) =>
+							opt.setName('reason').setDescription('Reason').setMaxLength(512).setRequired(false),
+						),
 				)
 				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
 					subcommand
 						.setName('remove')
 						.setDescription('Remove a user from the confession blacklist')
-						.addUserOption((opt: SlashCommandUserOption) => opt.setName('user').setDescription('User to unblacklist').setRequired(true)),
+						.addUserOption((opt: SlashCommandUserOption) =>
+							opt.setName('user').setDescription('User to unblacklist').setRequired(true),
+						),
 				)
 				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
 					subcommand
 						.setName('check')
 						.setDescription('Check if a user is blacklisted from confessions')
-						.addUserOption((opt: SlashCommandUserOption) => opt.setName('user').setDescription('User to check').setRequired(true)),
+						.addUserOption((opt: SlashCommandUserOption) =>
+							opt.setName('user').setDescription('User to check').setRequired(true),
+						),
 				),
 		);
 	}

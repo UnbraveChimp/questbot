@@ -19,7 +19,9 @@ export async function createAutoRole(
 		}
 
 		if (autoRoleCount >= 250 && hasUnlimitedAccess) {
-			throw new LimitError('A guild with unlimited access can only have up to 250 auto roles. This is to combat abuse.');
+			throw new LimitError(
+				'A guild with unlimited access can only have up to 250 auto roles. This is to combat abuse.',
+			);
 		}
 	}
 

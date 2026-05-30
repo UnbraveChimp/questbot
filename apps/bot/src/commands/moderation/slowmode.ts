@@ -15,9 +15,12 @@ export class SlowmodeCommand extends Command {
 			builder
 				.setName('slowmode')
 				.setDescription('Set or clear the slowmode for the current channel.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+				.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 				.addStringOption((option: SlashCommandStringOption) =>
-					option.setName('duration').setDescription('Provide a duration for slowmode, or leave blank to remove it').setMaxLength(20),
+					option
+						.setName('duration')
+						.setDescription('Provide a duration for slowmode, or leave blank to remove it')
+						.setMaxLength(20),
 				),
 		);
 	}
@@ -42,7 +45,11 @@ export class SlowmodeCommand extends Command {
 			return;
 		}
 
-		if (!member || !('permissions' in member) || !channel.permissionsFor(member)?.has(PermissionsBitField.Flags.ManageChannels)) {
+		if (
+			!member ||
+			!('permissions' in member) ||
+			!channel.permissionsFor(member)?.has(PermissionsBitField.Flags.ManageChannels)
+		) {
 			await interaction.reply({
 				content: `${emojis.rightArrow2} You do not have permission to manage channels.`,
 				flags: MessageFlags.Ephemeral,

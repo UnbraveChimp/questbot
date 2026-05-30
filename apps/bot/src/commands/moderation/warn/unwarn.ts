@@ -5,8 +5,8 @@ import {
 	ButtonStyle,
 	GuildMember,
 	MessageFlags,
-  SlashCommandStringOption,
-  PermissionFlagsBits,
+	SlashCommandStringOption,
+	PermissionFlagsBits,
 	PermissionsBitField,
 } from 'discord.js';
 import { getWarn, removeWarn } from '#lib/warns.js';
@@ -22,7 +22,7 @@ export class UnwarnCommand extends Command {
 			builder
 				.setName('unwarn')
 				.setDescription('Unwarn someone in the discord server.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+				.setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
 				.addStringOption((option: SlashCommandStringOption) =>
 					option.setName('id').setDescription('The ID of the warn to remove').setRequired(true).setMaxLength(36),
 				)

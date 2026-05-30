@@ -7,9 +7,7 @@ const TIMEOUT_MS = 10_000;
 export class SafeFetchError extends Error {}
 
 async function assertSafeHost(hostname: string): Promise<void> {
-	const records = ipaddr.isValid(hostname)
-		? [{ address: hostname }]
-		: await lookup(hostname, { all: true });
+	const records = ipaddr.isValid(hostname) ? [{ address: hostname }] : await lookup(hostname, { all: true });
 
 	if (records.length === 0) {
 		throw new SafeFetchError(`No DNS records for ${hostname}`);
@@ -29,7 +27,11 @@ function validate(url: URL) {
 
 export async function safeFetch(raw: string, init: RequestInit = {}): Promise<Response> {
 	let url: URL;
-	try { url = new URL(raw); } catch { throw new SafeFetchError('Invalid URL.'); }
+	try {
+		url = new URL(raw);
+	} catch {
+		throw new SafeFetchError('Invalid URL.');
+	}
 
 	for (let i = 0; i <= MAX_REDIRECTS; i++) {
 		validate(url);
@@ -38,8 +40,10 @@ export async function safeFetch(raw: string, init: RequestInit = {}): Promise<Re
 		const res = await fetch(url, {
 			...init,
 			redirect: 'manual',
-			signal: AbortSignal.timeout(TIMEOUT_MS)
-		}).catch(() => {throw new SafeFetchError('Request failed.');});
+			signal: AbortSignal.timeout(TIMEOUT_MS),
+		}).catch(() => {
+			throw new SafeFetchError('Request failed.');
+		});
 
 		if (res.status >= 300 && res.status < 400) {
 			const loc = res.headers.get('location');

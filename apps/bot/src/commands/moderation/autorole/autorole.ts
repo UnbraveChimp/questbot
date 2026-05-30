@@ -1,5 +1,15 @@
 import { Command } from '@sapphire/framework';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, SlashCommandRoleOption, SlashCommandBooleanOption, SlashCommandStringOption, SlashCommandSubcommandBuilder } from 'discord.js';
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	MessageFlags,
+	PermissionFlagsBits,
+	SlashCommandRoleOption,
+	SlashCommandBooleanOption,
+	SlashCommandStringOption,
+	SlashCommandSubcommandBuilder,
+} from 'discord.js';
 import { createAutoRole, getAutoRole, getAutoRoles, removeAutoRole } from '#lib/autorole.js';
 import { getQuestUnlimitedPurchaseComponents, LimitError } from '#lib/limits.js';
 import { emojis } from '#utils/emoji.js';
@@ -35,10 +45,17 @@ export class AutoRoleCommand extends Command {
 						.setName('remove')
 						.setDescription('Remove an auto role.')
 						.addStringOption((option: SlashCommandStringOption) =>
-							option.setName('role').setDescription('The auto role to remove').setAutocomplete(true).setRequired(true).setMaxLength(36),
+							option
+								.setName('role')
+								.setDescription('The auto role to remove')
+								.setAutocomplete(true)
+								.setRequired(true)
+								.setMaxLength(36),
 						),
 				)
-				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) => subcommand.setName('list').setDescription('List all auto roles.')),
+				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
+					subcommand.setName('list').setDescription('List all auto roles.'),
+				),
 		);
 	}
 

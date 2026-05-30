@@ -1,5 +1,11 @@
 import { Command } from '@sapphire/framework';
-import { GuildMember, MessageFlags, PermissionFlagsBits, PermissionsBitField, SlashCommandUserOption } from 'discord.js';
+import {
+	GuildMember,
+	MessageFlags,
+	PermissionFlagsBits,
+	PermissionsBitField,
+	SlashCommandUserOption,
+} from 'discord.js';
 import { getWarns } from '#lib/warns.js';
 import { emojis } from '#utils/emoji.js';
 
@@ -13,8 +19,10 @@ export class WarnsCommand extends Command {
 			builder
 				.setName('warns')
 				.setDescription('View (someones) warns.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
-				.addUserOption((option: SlashCommandUserOption) => option.setName('member').setDescription('Member to view warns of')),
+				.setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+				.addUserOption((option: SlashCommandUserOption) =>
+					option.setName('member').setDescription('Member to view warns of'),
+				),
 		);
 	}
 
