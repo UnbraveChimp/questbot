@@ -21,7 +21,7 @@ export class GuildMemberUpdateListener extends Listener<typeof Events.GuildMembe
 		const timeoutAdded = !beforeTimeout && afterTimeout;
 		const embed = new EmbedBuilder()
 			.setTitle(timeoutAdded ? 'Member Timed Out' : 'Timeout Removed')
-			.setColor(timeoutAdded ? Colors.Orange : 0xfac898)
+			.setColor(timeoutAdded ? 0xfac898 : 0xfac898)
 			.addFields(
 				{ name: 'Member', value: `${newMember.user.tag} (${newMember.id})`, inline: false },
 				{ name: 'Username', value: newMember.user.toString(), inline: true },
