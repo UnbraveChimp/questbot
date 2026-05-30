@@ -6,9 +6,9 @@ import {
 	GuildMember,
 	MessageFlags,
 	PermissionsBitField,
-  PermissionFlagsBits,
-  SlashCommandUserOption,
-  SlashCommandStringOption,
+	PermissionFlagsBits,
+	SlashCommandUserOption,
+	SlashCommandStringOption,
 } from 'discord.js';
 import ms, { type StringValue } from 'ms';
 import { createMute, enforceMute } from '#lib/mutes.js';
@@ -24,12 +24,16 @@ export class MuteCommand extends Command {
 			builder
 				.setName('mute')
 				.setDescription('Mute someone in the discord server.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+				.setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
 				.addUserOption((option: SlashCommandUserOption) =>
 					option.setName('member').setDescription('Select a member to mute').setRequired(true),
 				)
-				.addStringOption((option: SlashCommandStringOption) => option.setName('duration').setDescription('Specify a duration for the mute').setMaxLength(20))
-				.addStringOption((option: SlashCommandStringOption) => option.setName('reason').setDescription('Provide a reason for their mute').setMaxLength(512)),
+				.addStringOption((option: SlashCommandStringOption) =>
+					option.setName('duration').setDescription('Specify a duration for the mute').setMaxLength(20),
+				)
+				.addStringOption((option: SlashCommandStringOption) =>
+					option.setName('reason').setDescription('Provide a reason for their mute').setMaxLength(512),
+				),
 		);
 	}
 

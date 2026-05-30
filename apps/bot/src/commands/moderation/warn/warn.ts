@@ -7,7 +7,7 @@ import {
 	EmbedBuilder,
 	GuildMember,
 	MessageFlags,
-  PermissionFlagsBits,
+	PermissionFlagsBits,
 	PermissionsBitField,
 } from 'discord.js';
 import ms, { type StringValue } from 'ms';
@@ -25,12 +25,14 @@ export class WarnCommand extends Command {
 			builder
 				.setName('warn')
 				.setDescription('Warn someone in the discord server.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
-				.addUserOption((option) =>
-					option.setName('member').setDescription('Select a member to warn').setRequired(true),
+				.setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+				.addUserOption((option) => option.setName('member').setDescription('Select a member to warn').setRequired(true))
+				.addStringOption((option) =>
+					option.setName('reason').setDescription('Provide a reason for their warn').setMaxLength(512),
 				)
-				.addStringOption((option) => option.setName('reason').setDescription('Provide a reason for their warn').setMaxLength(512))
-				.addStringOption((option) => option.setName('duration').setDescription('Specify a duration for the warn').setMaxLength(20)),
+				.addStringOption((option) =>
+					option.setName('duration').setDescription('Specify a duration for the warn').setMaxLength(20),
+				),
 		);
 	}
 

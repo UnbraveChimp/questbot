@@ -43,7 +43,11 @@ export class PurgeCommand extends Command {
 			return;
 		}
 
-		if (!member || !('permissions' in member) || !channel.permissionsFor(member)?.has(PermissionsBitField.Flags.ManageMessages)) {
+		if (
+			!member ||
+			!('permissions' in member) ||
+			!channel.permissionsFor(member)?.has(PermissionsBitField.Flags.ManageMessages)
+		) {
 			await interaction.reply({
 				content: `${emojis.rightArrow2} You do not have permission to manage messages.`,
 				flags: MessageFlags.Ephemeral,

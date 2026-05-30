@@ -47,4 +47,3 @@ export class MessageUpdateListener extends Listener {
 		await logEmbed(guild, embed);
 	}
 }
-

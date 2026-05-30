@@ -30,7 +30,9 @@ export class ReminderCommand extends Command {
 					subcommand
 						.setName('remove')
 						.setDescription('Cancel a reminder.')
-						.addStringOption((option: SlashCommandStringOption) => option.setName('id').setDescription('The reminder ID').setRequired(true).setMaxLength(36)),
+						.addStringOption((option: SlashCommandStringOption) =>
+							option.setName('id').setDescription('The reminder ID').setRequired(true).setMaxLength(36),
+						),
 				),
 		);
 	}
