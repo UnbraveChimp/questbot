@@ -1,5 +1,5 @@
 import { Listener } from '@sapphire/framework';
-import { AuditLogEvent, Colors, EmbedBuilder, Events, type GuildMember } from 'discord.js';
+import { AuditLogEvent, EmbedBuilder, Events, type GuildMember } from 'discord.js';
 import { getRecentAuditLogEntry, logEmbed } from '#lib/logging.js';
 
 export class GuildMemberUpdateListener extends Listener<typeof Events.GuildMemberUpdate> {
