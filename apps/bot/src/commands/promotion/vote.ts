@@ -8,7 +8,7 @@ export class VoteCommand extends Command {
 
     public override registerApplicationCommands(registry: Command.Registry) {
         registry.registerChatInputCommand((builder) =>
-            builder.setName('vote').setDescription('Support QuestBot by voting for it!'),
+            builder.setName('vote').setDescription('Support Quest by voting for it!'),
         );
     }
 
