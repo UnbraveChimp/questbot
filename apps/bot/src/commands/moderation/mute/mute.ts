@@ -78,6 +78,15 @@ export class MuteCommand extends Command {
 			return;
 		}
 
+		const year = ms('1y');
+		if (duration !== null && duration > year) {
+			await interaction.reply({
+				content: `${emojis.rightArrow2} Mute duration cannot exceed 1 year.`,
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
+
 		if (targetMember.id === interaction.user.id) {
 			await interaction.reply({
 				content: `${emojis.rightArrow2} You cannot mute yourself.`,
