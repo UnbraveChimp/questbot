@@ -1,7 +1,6 @@
 import { Command } from '@sapphire/framework';
 import {
 	ActionRowBuilder,
-	Colors,
 	ButtonBuilder,
 	ButtonStyle,
 	EmbedBuilder,
@@ -157,7 +156,7 @@ export class WarnCommand extends Command {
 
 					const embed = new EmbedBuilder()
 						.setTitle('Member Warned')
-						.setColor(Colors.Orange)
+						.setColor(0xfac898)
 						.addFields(
 							{ name: 'Member', value: `<@${targetMember.id}>`, inline: true },
 							{ name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
