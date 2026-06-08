@@ -29,7 +29,7 @@ export class MuteCommand extends Command {
 					option.setName('member').setDescription('Select a member to mute').setRequired(true),
 				)
 				.addStringOption((option: SlashCommandStringOption) =>
-					option.setName('duration').setDescription('Specify a duration for the mute').setMaxLength(20),
+					option.setName('duration').setDescription('Specify a duration for the mute').setRequired(true).setMaxLength(20),
 				)
 				.addStringOption((option: SlashCommandStringOption) =>
 					option.setName('reason').setDescription('Provide a reason for their mute').setMaxLength(512),
@@ -78,10 +78,10 @@ export class MuteCommand extends Command {
 			return;
 		}
 
-		const year = ms('1y');
+		const year = ms('180d');
 		if (duration !== null && duration > year) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Mute duration cannot exceed 1 year.`,
+				content: `${emojis.rightArrow2} Mute duration cannot exceed 180 days.`,
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
