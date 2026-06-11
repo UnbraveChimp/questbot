@@ -10,6 +10,7 @@ export type ServerSettings = {
 	confessionEnabled: boolean;
 	loggingEnabled?: boolean;
 	loggingChannelId?: string | null;
+	haikuEnabled?: boolean;
 };
 
 export const DefaultSettings: ServerSettings = {
@@ -22,6 +23,7 @@ export const DefaultSettings: ServerSettings = {
 	confessionEnabled: false,
 	loggingEnabled: false,
 	loggingChannelId: null,
+	haikuEnabled: false,
 };
 
 export async function getSettings(guildId: string, guildName: string): Promise<ServerSettings> {

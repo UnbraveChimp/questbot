@@ -196,6 +196,29 @@ ${emojis.rightArrow2} ${status}`
 	};
 }
 
+function buildHaikuPanel(settings: ServerSettings, status?: string) {
+	const toggleMenu = new StringSelectMenuBuilder()
+		.setCustomId('haikuToggle')
+		.setPlaceholder(`${settings.haikuEnabled ? 'Enabled' : 'Disabled'}`)
+		.addOptions(
+			new StringSelectMenuOptionBuilder()
+				.setLabel('Enable')
+				.setDescription('Reply when a message forms a haiku.')
+				.setValue('enable'),
+			new StringSelectMenuOptionBuilder()
+				.setLabel('Disable')
+				.setDescription("Don't detect haikus.")
+				.setValue('disable'),
+		);
+
+	return {
+		content: status
+			? `${emojis.rightArrow1} **Haiku** module:\n${emojis.rightArrow2} ${status}`
+			: `${emojis.rightArrow1} **Haiku** module:`,
+		components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(toggleMenu)],
+	};
+}
+
 async function normalizeTicketSettings(guildId: string, guild: Guild, settings: ServerSettings) {
 	if (!settings.ticketCategoryId) return settings;
 
@@ -253,6 +276,10 @@ export class SettingsCommand extends Command {
 					.setLabel('Confessions')
 					.setDescription('Configure where confessions are posted and whether they are enabled.')
 					.setValue('confessions'),
+				new StringSelectMenuOptionBuilder()
+					.setLabel('Haiku')
+					.setDescription('Reply when a message forms a haiku.')
+					.setValue('haiku'),
 			);
 
 		const response = await interaction.reply({
@@ -299,6 +326,8 @@ export class SettingsCommand extends Command {
 				await settingChoice.update(buildLoggingPanel(settings, guild));
 			} else if (settingChoice.values[0] === 'confessions') {
 				await settingChoice.update(buildConfessionPanel(settings, guild));
+			} else if (settingChoice.values[0] === 'haiku') {
+				await settingChoice.update(buildHaikuPanel(settings));
 			} else {
 				return;
 			}
@@ -366,6 +395,11 @@ export class SettingsCommand extends Command {
 					const next = await updateSettings(guildId, guild.name, { confessionChannelId: channelId });
 
 					await i.update(buildConfessionPanel(next, guild, `Confession channel set to <#${channelId}>.`));
+				} else if (i.customId === 'haikuToggle' && i.isStringSelectMenu()) {
+					const enable = i.values[0] === 'enable';
+					const next = await updateSettings(guildId, guild.name, { haikuEnabled: enable });
+
+					await i.update(buildHaikuPanel(next, `Haiku **${enable ? 'enabled' : 'disabled'}**.`));
 				}
 			});
 

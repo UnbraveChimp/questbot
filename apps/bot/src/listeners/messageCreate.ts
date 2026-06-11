@@ -1,6 +1,8 @@
 import { Listener } from '@sapphire/framework';
 import { Events, type Message } from 'discord.js';
 import { getAutoMods } from '#lib/automod.js';
+import { isHaiku } from '#lib/haiku.js';
+import { getSettings } from '#lib/settings.js';
 
 export class MessageCreateListener extends Listener<typeof Events.MessageCreate> {
 	public constructor(context: Listener.LoaderContext, options: Listener.Options) {
@@ -31,6 +33,11 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 
 				break;
 			}
+		}
+
+		const settings = await getSettings(message.guild.id, message.guild.name);
+		if (settings.haikuEnabled && isHaiku(message.content)) {
+			await message.reply("That's a haiku!").catch((err) => console.error(err));
 		}
 
 		const moderatorIds = [
