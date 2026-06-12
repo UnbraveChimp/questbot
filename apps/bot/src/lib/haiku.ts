@@ -1,6 +1,6 @@
 import { cmuDictionaryLookup, syllableCount } from 'syllable-count-english';
 
-// all 15 ARPAbet vowel phonemes, each one is a syllable basically (without stress markers because those aren't useful here haha)
+// all 15 ARPAbet vowel phonemes, each one is a syllable basically
 const vowels = new Set(['AO', 'AA', 'IY', 'UW', 'EH', 'IH', 'UH', 'AH', 'AE', 'EY', 'AY', 'OW', 'AW', 'OY', 'ER']);
 
 const pattern = /\w+(?:[\w'\-.][\w.]+)?/g;
@@ -35,7 +35,7 @@ function syllables(word: string): Set<number> {
 
 	// support for oov words
 	if (counts.size === 0) {
-		// word isn't in cmu, fall back to the library.
+		// word isn't in cmu, fallback to the library
 		const count = syllableCount(word);
 		counts.add(count); // allows for the syllable count given by the library
 		counts.add(count + 1); // allows for an extra syllable in case the library fucks up
