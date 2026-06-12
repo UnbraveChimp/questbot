@@ -29,7 +29,11 @@ export class MuteCommand extends Command {
 					option.setName('member').setDescription('Select a member to mute').setRequired(true),
 				)
 				.addStringOption((option: SlashCommandStringOption) =>
-					option.setName('duration').setDescription('Specify a duration for the mute').setRequired(true).setMaxLength(20),
+					option
+						.setName('duration')
+						.setDescription('Specify a duration for the mute')
+						.setRequired(true)
+						.setMaxLength(20),
 				)
 				.addStringOption((option: SlashCommandStringOption) =>
 					option.setName('reason').setDescription('Provide a reason for their mute').setMaxLength(512),

@@ -42,9 +42,9 @@ importers:
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
-      syllable:
-        specifier: ^5.0.1
-        version: 5.0.1
+      syllable-count-english:
+        specifier: ^1.0.6
+        version: 1.0.6
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -3060,6 +3060,9 @@ packages:
   supports-color@10.2.2:
     resolution: {integrity: sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==}
     engines: {node: '>=18'}
+
+  syllable-count-english@1.0.6:
+    resolution: {integrity: sha512-Z0Sj+Djb9jMOQqJACqx93zGXbKOxKvWUwxQJ878leGHM4RWhxBDcvem/311xUY4cTPY+8sgkiYpr+nEStSg0DA==}
 
   syllable@5.0.1:
     resolution: {integrity: sha512-HWtNCp6v7J8H0lrT8j1HHjfOLltRoDcC7QRFVu25p4BE52JqetXG65nqC7CsatT8WQRfY4Qvh93BWJIUxbmXFg==}
@@ -6377,6 +6380,10 @@ snapshots:
       inline-style-parser: 0.2.7
 
   supports-color@10.2.2: {}
+
+  syllable-count-english@1.0.6:
+    dependencies:
+      syllable: 5.0.1
 
   syllable@5.0.1:
     dependencies:
