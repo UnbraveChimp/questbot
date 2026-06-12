@@ -12,7 +12,10 @@ function analyze(arpabet: string): { count: number; collapsible: boolean } {
 
 	for (let i = 0; i < phonemes.length; i++) {
 		if (vowels.has(phonemes[i].slice(0, 2))) count++; // count syllables by counting vowel phonemes (and slice the stress marker if it exists)
-		if (phonemes[i] === 'IY0' && vowels.has(phonemes[i + 1]?.slice(0, 2))) collapsible = true; // when ee is followed by another vowel can be pronounced as 1 syllable this is why we mark it as collapsible :D
+		const next = phonemes[i + 1];
+		// when ee is followed by another vowel can be pronounced as 1 syllable this is why we mark it as collapsible :D
+		// however it can only be collapsed if the next vowel is unstressed (ARPAbet vowel ends with 0)
+		if (phonemes[i] === 'IY0' && next?.endsWith('0') && vowels.has(next.slice(0, 2))) collapsible = true;
 	}
 
 	return { count, collapsible };
@@ -30,7 +33,14 @@ function syllables(word: string): Set<number> {
 		if (collapsible) counts.add(count - 1); // if the word is collapsible (which we marked before), we remove one syllable
 	}
 
-	if (counts.size === 0) counts.add(syllableCount(word)); // no variants in cmu, add the word itself using the library (fallback even though the library uses cmu it has it's own fallbacks so we make use of those)
+	// support for oov words
+	if (counts.size === 0) {
+		// word isn't in cmu, fall back to the library.
+		const count = syllableCount(word);
+		counts.add(count); // allows for the syllable count given by the library
+		counts.add(count + 1); // allows for an extra syllable in case the library fucks up
+		if (count > 1) counts.add(count - 1); // allows for one less syllable in case the library fucks up
+	}
 
 	return counts;
 }
