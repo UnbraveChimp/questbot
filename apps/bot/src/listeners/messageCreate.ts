@@ -13,11 +13,18 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 	}
 
 	public async run(message: Message) {
-		if (message.author.bot) return;
 		if (!message.guild) return;
 
-		const autoMods = await getAutoMods(message.guild.id);
+		// by doing this you ALLOW it to reply to bots haiku's such as ai bots writing one :D
 		const content = message.content.toLowerCase();
+		const settings = await getSettings(message.guild.id, message.guild.name);
+		if (settings.haikuEnabled && isHaiku(message.content)) {
+			await message.reply("That's a haiku!").catch((err) => console.error(err));
+		}
+
+		if (message.author.bot) return;
+
+		const autoMods = await getAutoMods(message.guild.id);
 
 		for (const autoMod of autoMods) {
 			if (!autoMod.word.trim()) continue;
@@ -33,11 +40,6 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 
 				break;
 			}
-		}
-
-		const settings = await getSettings(message.guild.id, message.guild.name);
-		if (settings.haikuEnabled && isHaiku(message.content)) {
-			await message.reply("That's a haiku!").catch((err) => console.error(err));
 		}
 
 		const moderatorIds = [
