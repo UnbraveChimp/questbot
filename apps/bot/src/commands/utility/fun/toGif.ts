@@ -3,7 +3,7 @@ import { AttachmentBuilder, SlashCommandStringOption } from 'discord.js';
 import sharp from 'sharp';
 import { emojis } from '#utils/emoji.js';
 import { safeFetch, SafeFetchError } from '#lib/safeFetch.js';
-import { errorEmbed, infoEmbed } from '#utils/embeds.js';
+import { errorEmbed } from '#utils/embeds.js';
 
 const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 const MAX_SIZE = 20 * 1024 * 1024;
