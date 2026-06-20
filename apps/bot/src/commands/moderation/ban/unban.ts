@@ -11,6 +11,7 @@ import {
 } from 'discord.js';
 import { getBan, removeBan } from '#lib/bans.js';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class UnbanCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -33,7 +34,7 @@ export class UnbanCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This command can only be used in a server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -43,7 +44,7 @@ export class UnbanCommand extends Command {
 
 		if (!member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You do not have permission to unban members.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} You do not have permission to unban members.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -57,20 +58,20 @@ export class UnbanCommand extends Command {
 
 		if (!discordBan && !dbBan) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} That user isn't banned.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} That user isn't banned.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
 
 		const confirm = new ButtonBuilder().setCustomId('confirm').setLabel('Confirm Unban').setStyle(ButtonStyle.Danger);
-
 		const cancel = new ButtonBuilder().setCustomId('cancel').setLabel('Cancel').setStyle(ButtonStyle.Secondary);
-
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(cancel, confirm);
 
 		const response = await interaction.reply({
-			content: `${emojis.rightArrow1} Are you sure you want to unban <@${targetMember.id}> for reason: ${reason}?`,
+			embeds: [
+				infoEmbed(`${emojis.rightArrow1} Are you sure you want to unban <@${targetMember.id}> for reason: ${reason}?`),
+			],
 			allowedMentions: { parse: [], users: [targetMember.id] },
 			components: [row],
 			withResponse: true,
@@ -85,7 +86,7 @@ export class UnbanCommand extends Command {
 
 			if (!confirmation) {
 				await interaction.editReply({
-					content: `${emojis.rightArrow2} No response within a minute or errored.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} No response within a minute or errored.`)],
 					components: [],
 				});
 				return;
@@ -98,28 +99,30 @@ export class UnbanCommand extends Command {
 						.send(`You have been unbanned in **${interaction.guild.name}**.\nReason: ${reason}`)
 						.catch(() => {});
 					await confirmation.update({
-						content: `${emojis.rightArrow2} <@${targetMember.id}> has been unbanned with reason: ${reason}`,
+						embeds: [
+							successEmbed(`${emojis.rightArrow2} <@${targetMember.id}> has been unbanned with reason: ${reason}`),
+						],
 						allowedMentions: { parse: [], users: [targetMember.id] },
 						components: [],
 					});
 				} catch (err) {
 					console.error(err);
 					await confirmation.update({
-						content: `${emojis.rightArrow2} Failed to unban <@${targetMember.id}> with reason: ${reason}`,
+						embeds: [errorEmbed(`${emojis.rightArrow2} Failed to unban <@${targetMember.id}> with reason: ${reason}`)],
 						allowedMentions: { parse: [], users: [targetMember.id] },
 						components: [],
 					});
 				}
 			} else if (confirmation.customId === 'cancel') {
 				await confirmation.update({
-					content: `${emojis.rightArrow2} Cancelled.`,
+					embeds: [infoEmbed(`${emojis.rightArrow2} Cancelled.`)],
 					components: [],
 				});
 			}
 		} catch (err) {
 			console.error(err);
 			await interaction.editReply({
-				content: `${emojis.rightArrow2} No response within a minute or errored.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} No response within a minute or errored.`)],
 				components: [],
 			});
 		}

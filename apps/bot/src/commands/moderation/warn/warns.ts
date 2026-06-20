@@ -8,6 +8,7 @@ import {
 } from 'discord.js';
 import { getWarns } from '#lib/warns.js';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class WarnsCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -29,7 +30,7 @@ export class WarnsCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This command can only be used in a server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -41,7 +42,7 @@ export class WarnsCommand extends Command {
 		if (targetOption && targetOption.id !== interaction.user.id) {
 			if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
 				await interaction.reply({
-					content: `${emojis.rightArrow2} You do not have permission to view other members' warns.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} You do not have permission to view other members' warns.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -53,7 +54,7 @@ export class WarnsCommand extends Command {
 
 		if (active.length === 0) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} <@${targetMember.user.id}> has no active warns.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} <@${targetMember.user.id}> has no active warns.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -66,6 +67,6 @@ export class WarnsCommand extends Command {
 
 		const content = `${emojis.rightArrow1} ${active.length} active warn(s) for <@${targetMember.user.id}>:\n${lines.join('\n')}`;
 
-		await interaction.reply({ content, flags: MessageFlags.Ephemeral });
+		await interaction.reply({ embeds: [infoEmbed(content)], flags: MessageFlags.Ephemeral });
 	}
 }

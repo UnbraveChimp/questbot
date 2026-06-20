@@ -14,6 +14,7 @@ import {
 import { getSettings } from '#lib/settings.js';
 import { storeConfessionContext, isConfessionBlacklisted } from '#lib/confessions.js';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, successEmbed } from '#utils/embeds.js';
 
 export class ConfessCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -29,7 +30,7 @@ export class ConfessCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		if (!interaction.inGuild() || !interaction.guild) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This command can only be used in a server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -39,7 +40,7 @@ export class ConfessCommand extends Command {
 
 		if (settings.confessionEnabled === false) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Confessions are disabled in this server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} Confessions are disabled in this server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -47,7 +48,7 @@ export class ConfessCommand extends Command {
 
 		if (!settings.confessionChannelId) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Confessions are not configured in this server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} Confessions are not configured in this server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -56,7 +57,11 @@ export class ConfessCommand extends Command {
 		const blacklistEntry = await isConfessionBlacklisted(interaction.user.id);
 		if (blacklistEntry) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You are blacklisted from confessions${blacklistEntry.reason ? ` reason: ${blacklistEntry.reason}` : ''}.`,
+				embeds: [
+					errorEmbed(
+						`${emojis.rightArrow2} You are blacklisted from confessions${blacklistEntry.reason ? ` reason: ${blacklistEntry.reason}` : ''}.`,
+					),
+				],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -95,7 +100,7 @@ export class ConfessCommand extends Command {
 
 		if (!(confessionChannel instanceof TextChannel)) {
 			await modalSubmit.editReply({
-				content: `${emojis.rightArrow2} The configured confession channel is unavailable.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} The configured confession channel is unavailable.`)],
 			});
 			return;
 		}
@@ -107,7 +112,7 @@ export class ConfessCommand extends Command {
 		let thread;
 
 		try {
-			const threadName = confession.replace(/\s+/g, ' ').slice(0, 10).toLowerCase() || 'confession';
+			const threadName = confession.replace(/\\s+/g, ' ').slice(0, 10).toLowerCase() || 'confession';
 			thread = await message.startThread({ name: `${threadName}` });
 		} catch (error) {
 			await message.delete().catch(() => null);
@@ -136,6 +141,6 @@ export class ConfessCommand extends Command {
 			throw error;
 		}
 
-		await modalSubmit.editReply({ content: `${emojis.rightArrow2} Confession sent.` });
+		await modalSubmit.editReply({ embeds: [successEmbed(`${emojis.rightArrow2} Confession sent.`)] });
 	}
 }

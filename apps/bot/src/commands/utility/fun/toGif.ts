@@ -3,6 +3,7 @@ import { AttachmentBuilder, SlashCommandStringOption } from 'discord.js';
 import sharp from 'sharp';
 import { emojis } from '#utils/emoji.js';
 import { safeFetch, SafeFetchError } from '#lib/safeFetch.js';
+import { errorEmbed, infoEmbed } from '#utils/embeds.js';
 
 const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 const MAX_SIZE = 20 * 1024 * 1024;
@@ -33,30 +34,38 @@ export class ToGifCommand extends Command {
 			response = await safeFetch(url);
 		} catch (err) {
 			const msg = err instanceof SafeFetchError ? err.message : 'Failed to fetch the URL.';
-			await interaction.editReply(`${emojis.rightArrow1} ${msg}`);
+			await interaction.editReply({ embeds: [errorEmbed(`${emojis.rightArrow1} ${msg}`)] });
 			return;
 		}
 
 		if (!response.ok) {
-			await interaction.editReply(`${emojis.rightArrow1} Could not retrieve the image (HTTP ${response.status}).`);
+			await interaction.editReply({
+				embeds: [errorEmbed(`${emojis.rightArrow1} Could not retrieve the image (HTTP ${response.status}).`)],
+			});
 			return;
 		}
 
 		const contentType = response.headers.get('content-type')?.split(';')[0].trim() ?? '';
 		if (!ALLOWED_TYPES.has(contentType)) {
-			await interaction.editReply(`${emojis.rightArrow1} Only PNG, JPEG, and WEBP images are supported.`);
+			await interaction.editReply({
+				embeds: [errorEmbed(`${emojis.rightArrow1} Only PNG, JPEG, and WEBP images are supported.`)],
+			});
 			return;
 		}
 
 		const contentLength = response.headers.get('content-length');
 		if (contentLength && parseInt(contentLength, 10) > MAX_SIZE) {
-			await interaction.editReply(`${emojis.rightArrow1} Image exceeds the 20 MB size limit.`);
+			await interaction.editReply({
+				embeds: [errorEmbed(`${emojis.rightArrow1} Image exceeds the 20 MB size limit.`)],
+			});
 			return;
 		}
 
 		const arrayBuffer = await response.arrayBuffer();
 		if (arrayBuffer.byteLength > MAX_SIZE) {
-			await interaction.editReply(`${emojis.rightArrow1} Image exceeds the 20 MB size limit.`);
+			await interaction.editReply({
+				embeds: [errorEmbed(`${emojis.rightArrow1} Image exceeds the 20 MB size limit.`)],
+			});
 			return;
 		}
 		const inputBuffer = Buffer.from(arrayBuffer);
@@ -65,7 +74,9 @@ export class ToGifCommand extends Command {
 		try {
 			gifBuffer = await sharp(inputBuffer, { failOn: 'error' }).gif().toBuffer();
 		} catch {
-			await interaction.editReply(`${emojis.rightArrow1} Failed to convert the image to GIF.`);
+			await interaction.editReply({
+				embeds: [errorEmbed(`${emojis.rightArrow1} Failed to convert the image to GIF.`)],
+			});
 			return;
 		}
 

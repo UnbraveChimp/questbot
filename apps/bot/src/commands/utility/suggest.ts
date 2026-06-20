@@ -1,6 +1,7 @@
 import { Command, BucketScope } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
 import { SlashCommandStringOption, MessageFlags } from 'discord.js';
+import { errorEmbed, successEmbed } from '#utils/embeds.js';
 
 export class SuggestCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -30,12 +31,16 @@ export class SuggestCommand extends Command {
 		const name = interaction.user.username;
 
 		if (!message) {
-			interaction.reply(`${emojis.rightArrow2} Please provide a suggestion!`);
+			interaction.reply({
+				embeds: [errorEmbed(`${emojis.rightArrow2} Please provide a suggestion!`)],
+			});
 			return;
 		}
 
 		if (!webhook) {
-			interaction.reply(`${emojis.rightArrow2} Suggestions have not been setup yet.`);
+			interaction.reply({
+				embeds: [errorEmbed(`${emojis.rightArrow2} Suggestions have not been setup yet.`)],
+			});
 			return;
 		}
 
@@ -55,14 +60,18 @@ export class SuggestCommand extends Command {
 			});
 
 			if (response.ok) {
-				await interaction.editReply(`${emojis.rightArrow1} Sent!`);
+				await interaction.editReply({ embeds: [successEmbed(`${emojis.rightArrow1} Sent!`)] });
 				return;
 			} else {
-				await interaction.editReply(`${emojis.rightArrow2} There was an error trying to send your suggestion!`);
+				await interaction.editReply({
+					embeds: [errorEmbed(`${emojis.rightArrow2} There was an error trying to send your suggestion!`)],
+				});
 				return;
 			}
 		} catch {
-			await interaction.editReply(`${emojis.rightArrow2} There was an error trying to send your suggestion!`);
+			await interaction.editReply({
+				embeds: [errorEmbed(`${emojis.rightArrow2} There was an error trying to send your suggestion!`)],
+			});
 			return;
 		}
 	}

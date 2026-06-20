@@ -8,6 +8,7 @@ import {
 	MessageFlags,
 	PermissionFlagsBits,
 } from 'discord.js';
+import { successEmbed } from '#utils/embeds.js';
 
 export class SetupTicketsCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -46,7 +47,7 @@ export class SetupTicketsCommand extends Command {
 		});
 
 		await interaction.reply({
-			content: `${emojis.rightArrow2} Ticket panel sent in ${channel}.`,
+			embeds: [successEmbed(`${emojis.rightArrow2} Ticket panel sent in ${channel}.`)],
 			flags: MessageFlags.Ephemeral,
 		});
 	}

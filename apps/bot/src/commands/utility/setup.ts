@@ -15,6 +15,7 @@ import {
 import { getSettings, updateSettings } from '#lib/settings.js';
 import { emojis } from '#utils/emoji.js';
 import { awaitMessageComponentSafe } from '#utils/collectors.js';
+import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 const staleInteractionErrorCodes = new Set([10_015, 50_027, 10062]);
 
@@ -88,7 +89,7 @@ export class SetupCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This command can only be used in a server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -106,14 +107,17 @@ export class SetupCommand extends Command {
 			}
 		};
 
-		// initial menu
 		const response = await interaction.reply({
-			content: [
-				`**Server Setup**`,
-				`${emojis.rightArrow1} This wizard will walk you through configuring the bot's features.`,
-				`${emojis.rightArrow1} You can adjust anything later with \`/settings\`.`,
-				`**Please put the newly created Quest role at the top of the role list!**`,
-			].join('\n'),
+			embeds: [
+				infoEmbed(
+					[
+						`**Server Setup**`,
+						`${emojis.rightArrow1} This wizard will walk you through configuring the bot's features.`,
+						`${emojis.rightArrow1} You can adjust anything later with \`/settings\`.`,
+						`**Please put the newly created Quest role at the top of the role list!**`,
+					].join('\n'),
+				),
+			],
 			components: [
 				new ActionRowBuilder<ButtonBuilder>().addComponents(
 					new ButtonBuilder().setCustomId('setup_start').setLabel('Get Started').setStyle(ButtonStyle.Success),
@@ -132,7 +136,7 @@ export class SetupCommand extends Command {
 		});
 
 		if (!startChoice || startChoice.customId === 'setup_cancel') {
-			await safeEditReply({ content: `${emojis.rightArrow2} Setup cancelled.`, components: [] });
+			await safeEditReply({ embeds: [infoEmbed(`${emojis.rightArrow2} Setup cancelled.`)], components: [] });
 			return;
 		}
 
@@ -141,10 +145,14 @@ export class SetupCommand extends Command {
 
 		// 1. welcome messages
 		await startChoice.update({
-			content: [
-				`**Setup (1/4) Welcome Messages**`,
-				`${emojis.rightArrow1} Would you like to send a welcome message when someone joins?`,
-			].join('\n'),
+			embeds: [
+				infoEmbed(
+					[
+						`**Setup (1/4) Welcome Messages**`,
+						`${emojis.rightArrow1} Would you like to send a welcome message when someone joins?`,
+					].join('\n'),
+				),
+			],
 			components: [yesNoRow()],
 		});
 
@@ -154,7 +162,7 @@ export class SetupCommand extends Command {
 		});
 
 		if (!welcomeFeatureChoice) {
-			await safeEditReply({ content: `${emojis.rightArrow2} Setup timed out.`, components: [] });
+			await safeEditReply({ embeds: [errorEmbed(`${emojis.rightArrow2} Setup timed out.`)], components: [] });
 			return;
 		}
 
@@ -162,11 +170,15 @@ export class SetupCommand extends Command {
 			let welcomeChannelId: string | null = null;
 
 			const buildWelcomeConfigPanel = (status?: string) => ({
-				content: [
-					`**Setup (1/4) Welcome Messages**`,
-					`${emojis.rightArrow1} Select the channel for welcome messages.`,
-					status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Next** when ready.`,
-				].join('\n'),
+				embeds: [
+					infoEmbed(
+						[
+							`**Setup (1/4) Welcome Messages**`,
+							`${emojis.rightArrow1} Select the channel for welcome messages.`,
+							status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Next** when ready.`,
+						].join('\n'),
+					),
+				],
 				components: [
 					new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
 						new ChannelSelectMenuBuilder()
@@ -201,7 +213,7 @@ export class SetupCommand extends Command {
 			});
 
 			if (!completed) {
-				await safeEditReply({ content: `${emojis.rightArrow2} Setup timed out.`, components: [] });
+				await safeEditReply({ embeds: [errorEmbed(`${emojis.rightArrow2} Setup timed out.`)], components: [] });
 				return;
 			}
 
@@ -221,7 +233,9 @@ export class SetupCommand extends Command {
 
 		// 2: tickets
 		await safeEditReply({
-			content: [`**Setup (2/4) Tickets**`, `${emojis.rightArrow1} Would you like to enable tickets?`].join('\n'),
+			embeds: [
+				infoEmbed([`**Setup (2/4) Tickets**`, `${emojis.rightArrow1} Would you like to enable tickets?`].join('\n')),
+			],
 			components: [yesNoRow()],
 		});
 
@@ -231,7 +245,7 @@ export class SetupCommand extends Command {
 		});
 
 		if (!ticketsFeatureChoice) {
-			await safeEditReply({ content: `${emojis.rightArrow2} Setup timed out.`, components: [] });
+			await safeEditReply({ embeds: [errorEmbed(`${emojis.rightArrow2} Setup timed out.`)], components: [] });
 			return;
 		}
 
@@ -241,11 +255,15 @@ export class SetupCommand extends Command {
 			let transcriptChannelId: string | null = null;
 
 			const buildTicketConfigPanel = (status?: string) => ({
-				content: [
-					`**Setup (2/4) Tickets**`,
-					`${emojis.rightArrow1} Configure the ticket system below. Staff role and transcript channel are optional.`,
-					status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Next** when ready.`,
-				].join('\n'),
+				embeds: [
+					infoEmbed(
+						[
+							`**Setup (2/4) Tickets**`,
+							`${emojis.rightArrow1} Configure the ticket system below. Staff role and transcript channel are optional.`,
+							status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Next** when ready.`,
+						].join('\n'),
+					),
+				],
 				components: [
 					new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
 						new ChannelSelectMenuBuilder()
@@ -305,7 +323,7 @@ export class SetupCommand extends Command {
 			});
 
 			if (!completed) {
-				await safeEditReply({ content: `${emojis.rightArrow2} Setup timed out.`, components: [] });
+				await safeEditReply({ embeds: [errorEmbed(`${emojis.rightArrow2} Setup timed out.`)], components: [] });
 				return;
 			}
 
@@ -319,11 +337,15 @@ export class SetupCommand extends Command {
 
 				// sub-panel: post ticket panel
 				await safeEditReply({
-					content: [
-						`**Setup (2/4) Ticket Panel**`,
-						`${emojis.rightArrow1} Would you like to post the ticket creation panel in a channel?`,
-						`${emojis.rightArrow1} Members click a button in that channel to open a ticket.`,
-					].join('\n'),
+					embeds: [
+						infoEmbed(
+							[
+								`**Setup (2/4) Ticket Panel**`,
+								`${emojis.rightArrow1} Would you like to post the ticket creation panel in a channel?`,
+								`${emojis.rightArrow1} Members click a button in that channel to open a ticket.`,
+							].join('\n'),
+						),
+					],
 					components: [
 						new ActionRowBuilder<ButtonBuilder>().addComponents(
 							new ButtonBuilder().setCustomId('setup_yes').setLabel('Yes!').setStyle(ButtonStyle.Success),
@@ -338,7 +360,7 @@ export class SetupCommand extends Command {
 				});
 
 				if (!panelChoice) {
-					await safeEditReply({ content: `${emojis.rightArrow2} Setup timed out.`, components: [] });
+					await safeEditReply({ embeds: [errorEmbed(`${emojis.rightArrow2} Setup timed out.`)], components: [] });
 					return;
 				}
 
@@ -346,11 +368,15 @@ export class SetupCommand extends Command {
 					let panelChannelId: string | null = null;
 
 					const buildPanelChannelPanel = (status?: string) => ({
-						content: [
-							`**Setup (2/4) Ticket Panel**`,
-							`${emojis.rightArrow1} Select the channel to post the ticket creation panel in.`,
-							status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Send Panel** when ready.`,
-						].join('\n'),
+						embeds: [
+							infoEmbed(
+								[
+									`**Setup (2/4) Ticket Panel**`,
+									`${emojis.rightArrow1} Select the channel to post the ticket creation panel in.`,
+									status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Send Panel** when ready.`,
+								].join('\n'),
+							),
+						],
 						components: [
 							new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
 								new ChannelSelectMenuBuilder()
@@ -414,10 +440,14 @@ export class SetupCommand extends Command {
 
 		// 3: logging
 		await safeEditReply({
-			content: [
-				`**Setup (3/4) Logging**`,
-				`${emojis.rightArrow1} Would you like to log server events (bans, kicks, message deletions, etc.) in a channel?`,
-			].join('\n'),
+			embeds: [
+				infoEmbed(
+					[
+						`**Setup (3/4) Logging**`,
+						`${emojis.rightArrow1} Would you like to log server events (bans, kicks, message deletions, etc.) in a channel?`,
+					].join('\n'),
+				),
+			],
 			components: [yesNoRow()],
 		});
 
@@ -427,7 +457,7 @@ export class SetupCommand extends Command {
 		});
 
 		if (!loggingFeatureChoice) {
-			await safeEditReply({ content: `${emojis.rightArrow2} Setup timed out.`, components: [] });
+			await safeEditReply({ embeds: [errorEmbed(`${emojis.rightArrow2} Setup timed out.`)], components: [] });
 			return;
 		}
 
@@ -435,11 +465,15 @@ export class SetupCommand extends Command {
 			let loggingChannelId: string | null = null;
 
 			const buildLoggingConfigPanel = (status?: string) => ({
-				content: [
-					`**Setup (3/4) Logging**`,
-					`${emojis.rightArrow1} Select the channel where server events will be logged.`,
-					status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Next** when ready.`,
-				].join('\n'),
+				embeds: [
+					infoEmbed(
+						[
+							`**Setup (3/4) Logging**`,
+							`${emojis.rightArrow1} Select the channel where server events will be logged.`,
+							status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Next** when ready.`,
+						].join('\n'),
+					),
+				],
 				components: [
 					new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
 						new ChannelSelectMenuBuilder()
@@ -474,7 +508,7 @@ export class SetupCommand extends Command {
 			});
 
 			if (!completed) {
-				await safeEditReply({ content: `${emojis.rightArrow2} Setup timed out.`, components: [] });
+				await safeEditReply({ embeds: [errorEmbed(`${emojis.rightArrow2} Setup timed out.`)], components: [] });
 				return;
 			}
 
@@ -494,9 +528,11 @@ export class SetupCommand extends Command {
 
 		// 4: confessions
 		await safeEditReply({
-			content: [`**Setup (4/4) Confessions**`, `${emojis.rightArrow1} Would you like to enable confessions?`].join(
-				'\n',
-			),
+			embeds: [
+				infoEmbed(
+					[`**Setup (4/4) Confessions**`, `${emojis.rightArrow1} Would you like to enable confessions?`].join('\n'),
+				),
+			],
 			components: [yesNoRow()],
 		});
 
@@ -506,7 +542,7 @@ export class SetupCommand extends Command {
 		});
 
 		if (!confessionsFeatureChoice) {
-			await safeEditReply({ content: `${emojis.rightArrow2} Setup timed out.`, components: [] });
+			await safeEditReply({ embeds: [errorEmbed(`${emojis.rightArrow2} Setup timed out.`)], components: [] });
 			return;
 		}
 
@@ -514,11 +550,15 @@ export class SetupCommand extends Command {
 			let confessionChannelId: string | null = null;
 
 			const buildConfessionConfigPanel = (status?: string) => ({
-				content: [
-					`**Setup (4/4) Confessions**`,
-					`${emojis.rightArrow1} Select the channel where anonymous confessions will be posted.`,
-					status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Next** when ready.`,
-				].join('\n'),
+				embeds: [
+					infoEmbed(
+						[
+							`**Setup (4/4) Confessions**`,
+							`${emojis.rightArrow1} Select the channel where anonymous confessions will be posted.`,
+							status ? `${emojis.rightArrow2} ${status}` : `${emojis.rightArrow1} Click **Next** when ready.`,
+						].join('\n'),
+					),
+				],
 				components: [
 					new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
 						new ChannelSelectMenuBuilder()
@@ -555,7 +595,7 @@ export class SetupCommand extends Command {
 			});
 
 			if (!completed) {
-				await safeEditReply({ content: `${emojis.rightArrow2} Setup timed out.`, components: [] });
+				await safeEditReply({ embeds: [errorEmbed(`${emojis.rightArrow2} Setup timed out.`)], components: [] });
 				return;
 			}
 
@@ -574,15 +614,19 @@ export class SetupCommand extends Command {
 		}
 
 		await safeEditReply({
-			content: [
-				`**Here's what was configured:**`,
-				...summary,
-				'',
-				`**What's next?**`,
-				`${emojis.rightArrow1} Use \`/automod add\` to block words in your server.`,
-				`${emojis.rightArrow1} Use \`/autorole add\` to assign roles to new members automatically.`,
-				`${emojis.rightArrow1} Use \`/settings\` to adjust any of these at any time.`,
-			].join('\n'),
+			embeds: [
+				successEmbed(
+					[
+						`**Here's what was configured:**`,
+						...summary,
+						'',
+						`**What's next?**`,
+						`${emojis.rightArrow1} Use \`/automod add\` to block words in your server.`,
+						`${emojis.rightArrow1} Use \`/autorole add\` to assign roles to new members automatically.`,
+						`${emojis.rightArrow1} Use \`/settings\` to adjust any of these at any time.`,
+					].join('\n'),
+				),
+			],
 			components: [],
 		});
 

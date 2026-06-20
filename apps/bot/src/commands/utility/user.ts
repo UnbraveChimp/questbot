@@ -1,5 +1,6 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
+import { infoEmbed } from '#utils/embeds.js';
 
 export class UserCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -13,6 +14,8 @@ export class UserCommand extends Command {
 	}
 
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		await interaction.reply(`${emojis.rightArrow2} This command was run by **${interaction.user.username}**.`);
+		await interaction.reply({
+			embeds: [infoEmbed(`${emojis.rightArrow2} This command was run by **${interaction.user.username}**.`)],
+		});
 	}
 }

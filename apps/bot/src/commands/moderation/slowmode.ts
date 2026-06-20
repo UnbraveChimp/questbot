@@ -2,6 +2,7 @@ import { Command } from '@sapphire/framework';
 import { MessageFlags, PermissionsBitField, PermissionFlagsBits, SlashCommandStringOption } from 'discord.js';
 import ms, { type StringValue } from 'ms';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, successEmbed } from '#utils/embeds.js';
 
 const MAX_SLOWMODE_SECONDS = 21_600;
 
@@ -28,7 +29,7 @@ export class SlowmodeCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This command can only be used in a server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -39,7 +40,7 @@ export class SlowmodeCommand extends Command {
 
 		if (!channel || !('setRateLimitPerUser' in channel)) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This channel does not support slowmode.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This channel does not support slowmode.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -51,7 +52,7 @@ export class SlowmodeCommand extends Command {
 			!channel.permissionsFor(member)?.has(PermissionsBitField.Flags.ManageChannels)
 		) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You do not have permission to manage channels.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} You do not have permission to manage channels.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -62,7 +63,7 @@ export class SlowmodeCommand extends Command {
 
 		if (durationStr && (typeof durationMs !== 'number' || Number.isNaN(durationMs))) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Invalid duration format.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} Invalid duration format.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -72,7 +73,7 @@ export class SlowmodeCommand extends Command {
 
 		if (slowmodeSeconds < 0 || slowmodeSeconds > MAX_SLOWMODE_SECONDS) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Slowmode must be between 0 seconds and 6 hours.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} Slowmode must be between 0 seconds and 6 hours.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -82,16 +83,19 @@ export class SlowmodeCommand extends Command {
 			await channel.setRateLimitPerUser(slowmodeSeconds);
 
 			await interaction.reply({
-				content:
-					slowmodeSeconds === 0
-						? `${emojis.rightArrow1} Slowmode cleared in <#${channel.id}>.`
-						: `${emojis.rightArrow1} Slowmode set to ${slowmodeSeconds} second${slowmodeSeconds === 1 ? '' : 's'} in <#${channel.id}>.`,
+				embeds: [
+					successEmbed(
+						slowmodeSeconds === 0
+							? `${emojis.rightArrow1} Slowmode cleared in <#${channel.id}>.`
+							: `${emojis.rightArrow1} Slowmode set to ${slowmodeSeconds} second${slowmodeSeconds === 1 ? '' : 's'} in <#${channel.id}>.`,
+					),
+				],
 				flags: MessageFlags.Ephemeral,
 			});
 		} catch (error) {
 			console.error(error);
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Failed to update slowmode for this channel.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} Failed to update the slowmode for this channel.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 		}

@@ -15,6 +15,7 @@ import {
 } from 'discord.js';
 import { getSettings, type ServerSettings, updateSettings } from '#lib/settings.js';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, infoEmbed } from '#utils/embeds.js';
 
 const staleInteractionErrorCodes = new Set([10_015, 50_027, 10062]);
 
@@ -53,9 +54,13 @@ function buildWelcomePanel(settings: ServerSettings, guild: Guild, status?: stri
 		.setChannelTypes(ChannelType.GuildText);
 
 	return {
-		content: status
-			? `${emojis.rightArrow1} **Welcome** module:\n${emojis.rightArrow2} ${status}`
-			: `${emojis.rightArrow1} **Welcome** module:`,
+		embeds: [
+			infoEmbed(
+				status
+					? `${emojis.rightArrow1} **Welcome** module:\n${emojis.rightArrow2} ${status}`
+					: `${emojis.rightArrow1} **Welcome** module:`,
+			),
+		],
 		components: [
 			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(toggleMenu),
 			new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(channelMenu),
@@ -109,9 +114,13 @@ function buildTicketPanel(settings: ServerSettings, guild: Guild, status?: strin
 		.setDisabled(!settings.ticketTranscriptChannelId);
 
 	return {
-		content: status
-			? `${emojis.rightArrow1} **Tickets** module:\n${emojis.rightArrow2} ${status}`
-			: `${emojis.rightArrow1} **Tickets** module:`,
+		embeds: [
+			infoEmbed(
+				status
+					? `${emojis.rightArrow1} **Tickets** module:\n${emojis.rightArrow2} ${status}`
+					: `${emojis.rightArrow1} **Tickets** module:`,
+			),
+		],
 		components: [
 			new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(categoryMenu),
 			new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(staffRole),
@@ -150,9 +159,13 @@ function buildLoggingPanel(settings: ServerSettings, guild: Guild, status?: stri
 		.setChannelTypes(ChannelType.GuildText);
 
 	return {
-		content: status
-			? `${emojis.rightArrow1} **Logging** module:\n${emojis.rightArrow2} ${status}`
-			: `${emojis.rightArrow1} **Logging** module:`,
+		embeds: [
+			infoEmbed(
+				status
+					? `${emojis.rightArrow1} **Logging** module:\n${emojis.rightArrow2} ${status}`
+					: `${emojis.rightArrow1} **Logging** module:`,
+			),
+		],
 		components: [
 			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(toggleMenu),
 			new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(channelMenu),
@@ -185,10 +198,13 @@ function buildConfessionPanel(settings: ServerSettings, guild: Guild, status?: s
 		.setChannelTypes(ChannelType.GuildText);
 
 	return {
-		content: status
-			? `${emojis.rightArrow1} **Confessions** module:
-${emojis.rightArrow2} ${status}`
-			: `${emojis.rightArrow1} **Confessions** module:`,
+		embeds: [
+			infoEmbed(
+				status
+					? `${emojis.rightArrow1} **Confessions** module:\n${emojis.rightArrow2} ${status}`
+					: `${emojis.rightArrow1} **Confessions** module:`,
+			),
+		],
 		components: [
 			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(toggleMenu),
 			new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(channelMenu),
@@ -212,9 +228,13 @@ function buildHaikuPanel(settings: ServerSettings, status?: string) {
 		);
 
 	return {
-		content: status
-			? `${emojis.rightArrow1} **Haiku** module:\n${emojis.rightArrow2} ${status}`
-			: `${emojis.rightArrow1} **Haiku** module:`,
+		embeds: [
+			infoEmbed(
+				status
+					? `${emojis.rightArrow1} **Haiku** module:\n${emojis.rightArrow2} ${status}`
+					: `${emojis.rightArrow1} **Haiku** module:`,
+			),
+		],
 		components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(toggleMenu)],
 	};
 }
@@ -297,7 +317,7 @@ export class SettingsCommand extends Command {
 
 			if (!settingChoice) {
 				await safeEditReply({
-					content: `${emojis.rightArrow2} No response within a minute or errored.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} No response within a minute or errored.`)],
 					components: [],
 				});
 				return;
@@ -310,7 +330,7 @@ export class SettingsCommand extends Command {
 
 			if (!guildId || !guild) {
 				await settingChoice.update({
-					content: `${emojis.rightArrow2} This command can only be used in a server.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 					components: [],
 				});
 				return;
@@ -405,14 +425,14 @@ export class SettingsCommand extends Command {
 
 			collector.on('end', async () => {
 				await safeEditReply({
-					content: `${emojis.rightArrow2} Closed.`,
+					embeds: [infoEmbed(`${emojis.rightArrow2} Closed.`)],
 					components: [],
 				});
 			});
 		} catch (err) {
 			console.error(err);
 			await safeEditReply({
-				content: `${emojis.rightArrow2} No response within a minute or errored.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} No response within a minute or errored.`)],
 				components: [],
 			});
 		}

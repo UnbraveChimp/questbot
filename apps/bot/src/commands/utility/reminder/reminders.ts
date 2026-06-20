@@ -2,6 +2,7 @@ import { Command } from '@sapphire/framework';
 import { MessageFlags } from 'discord.js';
 import { getReminders } from '#lib/reminders.js';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class RemindersCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -21,7 +22,11 @@ export class RemindersCommand extends Command {
 
 		if (reminders.length === 0) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You have no active reminders${interaction.inCachedGuild() ? ' in this server' : ''}.`,
+				embeds: [
+					errorEmbed(
+						`${emojis.rightArrow2} You have no active reminders${interaction.inCachedGuild() ? ' in this server' : ''}.`,
+					),
+				],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -33,7 +38,7 @@ export class RemindersCommand extends Command {
 		});
 
 		await interaction.reply({
-			content: `${emojis.rightArrow2} Your reminders:\n${lines.join('\n')}`,
+			embeds: [infoEmbed(`${emojis.rightArrow2} Your reminders:\n${lines.join('\n')}`)],
 			flags: MessageFlags.Ephemeral,
 		});
 	}

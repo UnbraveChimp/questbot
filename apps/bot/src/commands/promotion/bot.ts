@@ -1,5 +1,6 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
+import { infoEmbed } from '#utils/embeds.js';
 
 export class BotCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -13,6 +14,6 @@ export class BotCommand extends Command {
 	}
 
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		await interaction.reply(`${emojis.rightArrow1} https://duckorg.com/bot/invite`);
+		await interaction.reply({ embeds: [infoEmbed(`${emojis.rightArrow1} https://duckorg.com/bot/invite`)] });
 	}
 }

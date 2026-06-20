@@ -2,6 +2,7 @@ import { Command } from '@sapphire/framework';
 import { getQuestUnlimitedPurchaseComponents } from '#lib/limits.js';
 import { MessageFlags } from 'discord.js';
 import { emojis } from '#utils/emoji.js';
+import { infoEmbed } from '#utils/embeds.js';
 
 export class QuestUnlimitedCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -16,7 +17,7 @@ export class QuestUnlimitedCommand extends Command {
 
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		await interaction.reply({
-			content: `${emojis.questUnlimited2} Purchase Quest Unlimited below:`,
+			embeds: [infoEmbed(`${emojis.questUnlimited2} Purchase Quest Unlimited below:`)],
 			components: getQuestUnlimitedPurchaseComponents(interaction.client.application.id),
 			flags: MessageFlags.Ephemeral,
 		});

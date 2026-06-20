@@ -13,6 +13,7 @@ import ms, { type StringValue } from 'ms';
 import { createWarn } from '#lib/warns.js';
 import { logEmbed, truncate } from '#lib/logging.js';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class WarnCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -38,7 +39,7 @@ export class WarnCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This command can only be used in a server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -48,7 +49,7 @@ export class WarnCommand extends Command {
 
 		if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You do not have permission to warn members.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} You do not have permission to warn members.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -62,7 +63,7 @@ export class WarnCommand extends Command {
 
 		if (durationStr && (typeof duration !== 'number' || isNaN(duration))) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Invalid duration format.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} Invalid duration format.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -70,7 +71,7 @@ export class WarnCommand extends Command {
 
 		if (!targetMember) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} That user is not in this server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} That user is not in this server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -78,7 +79,7 @@ export class WarnCommand extends Command {
 
 		if (targetMember.id === interaction.user.id) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You cannot warn yourself.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} You cannot warn yourself.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -86,7 +87,7 @@ export class WarnCommand extends Command {
 
 		if (targetMember.id === interaction.guild.ownerId) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You cannot warn the server owner.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} You cannot warn the server owner.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -94,7 +95,7 @@ export class WarnCommand extends Command {
 
 		if (member.roles.highest.position <= targetMember.roles.highest.position) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You cannot moderate someone with a higher or equal role.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} You cannot moderate someone with a higher or equal role.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -102,20 +103,22 @@ export class WarnCommand extends Command {
 
 		if (!targetMember.moderatable) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} I cannot warn this user.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} I cannot warn this user.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
 
 		const confirm = new ButtonBuilder().setCustomId('confirm').setLabel('Confirm Warn').setStyle(ButtonStyle.Danger);
-
 		const cancel = new ButtonBuilder().setCustomId('cancel').setLabel('Cancel').setStyle(ButtonStyle.Secondary);
-
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(cancel, confirm);
 
 		const response = await interaction.reply({
-			content: `${emojis.rightArrow1} Are you sure you want to warn <@${targetMember.user.id}> with reason: ${reason}?`,
+			embeds: [
+				infoEmbed(
+					`${emojis.rightArrow1} Are you sure you want to warn <@${targetMember.user.id}> with reason: ${reason}?`,
+				),
+			],
 			allowedMentions: { parse: [], users: [targetMember.user.id] },
 			components: [row],
 			withResponse: true,
@@ -130,7 +133,7 @@ export class WarnCommand extends Command {
 
 			if (!confirmation) {
 				await interaction.editReply({
-					content: `${emojis.rightArrow2} No response within a minute or errored.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} No response within a minute or errored.`)],
 					components: [],
 				});
 				return;
@@ -148,13 +151,11 @@ export class WarnCommand extends Command {
 					);
 					await targetMember
 						.send(
-							`You have been warned in **${interaction.guild.name}**.\nReason: ${reason}${
-								expiresAt ? `\nExpires: <t:${Math.floor(expiresAt.getTime() / 1000)}:R>` : ''
-							}`,
+							`You have been warned in **${interaction.guild.name}**.\nReason: ${reason}${expiresAt ? `\nExpires: <t:${Math.floor(expiresAt.getTime() / 1000)}:R>` : ''}`,
 						)
 						.catch(() => {});
 
-					const embed = new EmbedBuilder()
+					const logEntry = new EmbedBuilder()
 						.setTitle('Member Warned')
 						.setColor(0xfac898)
 						.addFields(
@@ -165,37 +166,36 @@ export class WarnCommand extends Command {
 						.setTimestamp();
 
 					if (expiresAt) {
-						embed.addFields({
+						logEntry.addFields({
 							name: 'Expires',
 							value: `<t:${Math.floor(expiresAt.getTime() / 1000)}:R>`,
 							inline: true,
 						});
 					}
 
-					await logEmbed(interaction.guild, embed);
+					await logEmbed(interaction.guild, logEntry);
 					await confirmation.update({
-						content: `${emojis.rightArrow2} <@${targetMember.id}> has been warned with reason: ${reason}`,
+						embeds: [
+							successEmbed(`${emojis.rightArrow2} <@${targetMember.id}> has been warned with reason: ${reason}`),
+						],
 						allowedMentions: { parse: [], users: [targetMember.user.id] },
 						components: [],
 					});
 				} catch (err) {
 					console.error(err);
 					await confirmation.update({
-						content: `${emojis.rightArrow2} Failed to warn <@${targetMember.id}>`,
+						embeds: [errorEmbed(`${emojis.rightArrow2} Failed to warn <@${targetMember.id}>`)],
 						allowedMentions: { parse: [], users: [targetMember.user.id] },
 						components: [],
 					});
 				}
 			} else if (confirmation.customId === 'cancel') {
-				await confirmation.update({
-					content: `${emojis.rightArrow2} Cancelled.`,
-					components: [],
-				});
+				await confirmation.update({ embeds: [infoEmbed(`${emojis.rightArrow2} Cancelled.`)], components: [] });
 			}
 		} catch (err) {
 			console.error(err);
 			await interaction.editReply({
-				content: `${emojis.rightArrow2} No response within a minute or errored.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} No response within a minute or errored.`)],
 				components: [],
 			});
 		}

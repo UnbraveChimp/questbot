@@ -11,6 +11,7 @@ import {
 } from 'discord.js';
 import { getWarn, removeWarn } from '#lib/warns.js';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class UnwarnCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -35,7 +36,7 @@ export class UnwarnCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This command can only be used in a server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -45,7 +46,7 @@ export class UnwarnCommand extends Command {
 
 		if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You do not have permission to remove warns.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} You do not have permission to remove warns.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -58,20 +59,22 @@ export class UnwarnCommand extends Command {
 
 		if (!warn) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} No warn found with that ID in this server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} No warn found with that ID in this server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
 
 		const confirm = new ButtonBuilder().setCustomId('confirm').setLabel('Confirm Unwarn').setStyle(ButtonStyle.Danger);
-
 		const cancel = new ButtonBuilder().setCustomId('cancel').setLabel('Cancel').setStyle(ButtonStyle.Secondary);
-
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(cancel, confirm);
 
 		const response = await interaction.reply({
-			content: `${emojis.rightArrow1} Are you sure you want to unwarn <@${warn.userId}> with reason: ${reason}?\n${emojis.rightArrow2} They were warned for: ${warn.reason} <t:${Math.floor(warn.createdAt.getTime() / 1000)}:R>`,
+			embeds: [
+				infoEmbed(
+					`${emojis.rightArrow1} Are you sure you want to unwarn <@${warn.userId}> with reason: ${reason}?\n${emojis.rightArrow2} They were warned for: ${warn.reason} <t:${Math.floor(warn.createdAt.getTime() / 1000)}:R>`,
+				),
+			],
 			allowedMentions: { parse: [], users: [warn.userId] },
 			components: [row],
 			withResponse: true,
@@ -86,7 +89,7 @@ export class UnwarnCommand extends Command {
 
 			if (!confirmation) {
 				await interaction.editReply({
-					content: `${emojis.rightArrow2} No response within a minute or errored.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} No response within a minute or errored.`)],
 					components: [],
 				});
 				return;
@@ -100,27 +103,31 @@ export class UnwarnCommand extends Command {
 						.send(`Your warn for ${warn.reason} in **${interaction.guild.name}** has been removed.\nReason: ${reason}`)
 						.catch(() => {});
 					await confirmation.update({
-						content: `${emojis.rightArrow2} \`${warn.id}\` has been removed from <@${warn.userId}>. Reason: ${reason}`,
+						embeds: [
+							successEmbed(
+								`${emojis.rightArrow2} \`${warn.id}\` has been removed from <@${warn.userId}>. Reason: ${reason}`,
+							),
+						],
 						allowedMentions: { parse: [], users: [warn.userId] },
 						components: [],
 					});
 				} catch (err) {
 					console.error(`Failed to remove warn ${warn.id}:`, err);
 					await confirmation.update({
-						content: `${emojis.rightArrow2} Failed to remove warn \`${warn.id}\` from <@${warn.userId}>.`,
+						embeds: [errorEmbed(`${emojis.rightArrow2} Failed to remove warn \`${warn.id}\` from <@${warn.userId}>.`)],
 						allowedMentions: { parse: [], users: [warn.userId] },
 						components: [],
 					});
 				}
 			} else if (confirmation.customId === 'cancel') {
 				await confirmation.update({
-					content: `${emojis.rightArrow2} Cancelled.`,
+					embeds: [infoEmbed(`${emojis.rightArrow2} Cancelled.`)],
 					components: [],
 				});
 			}
 		} catch {
 			await interaction.editReply({
-				content: `${emojis.rightArrow2} No response within a minute or errored.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} No response within a minute or errored.`)],
 				components: [],
 			});
 		}

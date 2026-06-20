@@ -1,5 +1,6 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
+import { infoEmbed } from '#utils/embeds.js';
 
 export class PingCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -18,8 +19,12 @@ export class PingCommand extends Command {
 		const ping = reply.createdTimestamp - interaction.createdTimestamp;
 		const shardId = interaction.client.shard?.ids?.[0];
 
-		await interaction.editReply(
-			`${emojis.rightArrow1} Client: ${ping}ms\n${emojis.rightArrow1} Websocket: ${interaction.client.ws.ping}ms\n${emojis.rightArrow2} Shard: #${typeof shardId === 'number' ? shardId : 'N/A'}`,
-		);
+		await interaction.editReply({
+			embeds: [
+				infoEmbed(
+					`${emojis.rightArrow1} Client: ${ping}ms\n${emojis.rightArrow1} Websocket: ${interaction.client.ws.ping}ms\n${emojis.rightArrow2} Shard: #${typeof shardId === 'number' ? shardId : 'N/A'}`,
+				),
+			],
+		});
 	}
 }

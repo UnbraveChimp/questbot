@@ -4,6 +4,7 @@ import ms, { type StringValue } from 'ms';
 import { createReminder, getReminder, removeReminder } from '#lib/reminders.js';
 import { LimitError } from '#lib/limits.js';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class ReminderCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -47,7 +48,7 @@ export class ReminderCommand extends Command {
 			const duration = ms(durationStr as StringValue);
 			if (typeof duration !== 'number' || isNaN(duration) || duration <= 0) {
 				await interaction.reply({
-					content: `${emojis.rightArrow2} Invalid duration.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} Invalid duration.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -55,7 +56,7 @@ export class ReminderCommand extends Command {
 
 			if (duration > 31_536_000_000) {
 				await interaction.reply({
-					content: `${emojis.rightArrow2} Reminder cannot be longer than 1 year.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} Reminder cannot be longer than 1 year.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -77,7 +78,11 @@ export class ReminderCommand extends Command {
 
 				const unix = Math.floor(remindAt.getTime() / 1000);
 				await interaction.reply({
-					content: `${emojis.rightArrow2} Reminder set to go off in <t:${unix}:R>. Message: ${message}\nID: \`${reminder.id}\``,
+					embeds: [
+						infoEmbed(
+							`${emojis.rightArrow2} Reminder set to go off in <t:${unix}:R>. Message: ${message}\nID: \`${reminder.id}\``,
+						),
+					],
 					allowedMentions: { parse: [] },
 				});
 
@@ -89,7 +94,7 @@ export class ReminderCommand extends Command {
 				console.error(err);
 				if (err instanceof LimitError) {
 					await interaction.reply({
-						content: `${emojis.rightArrow2} ${err.message}`,
+						embeds: [errorEmbed(`${emojis.rightArrow2} ${err.message}`)],
 						flags: MessageFlags.Ephemeral,
 					});
 					return;
@@ -105,7 +110,7 @@ export class ReminderCommand extends Command {
 
 			if (!reminder) {
 				await interaction.reply({
-					content: `${emojis.rightArrow2} No reminder found.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} No reminder found.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -113,7 +118,7 @@ export class ReminderCommand extends Command {
 
 			if (reminder.userId !== interaction.user.id) {
 				await interaction.reply({
-					content: `${emojis.rightArrow2} You can't remove others' reminders.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} You can't remove others' reminders.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -121,7 +126,7 @@ export class ReminderCommand extends Command {
 
 			await removeReminder(id);
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Reminder removed.`,
+				embeds: [successEmbed(`${emojis.rightArrow2} Reminder removed.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 

@@ -12,6 +12,7 @@ import { createAutoMod, DuplicateAutoModError, getAutoMod, getAutoMods, removeAu
 import { getQuestUnlimitedPurchaseComponents, LimitError } from '#lib/limits.js';
 import { emojis } from '#utils/emoji.js';
 import { awaitMessageComponentSafe } from '#utils/collectors.js';
+import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class AutoModCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -76,7 +77,7 @@ export class AutoModCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This command can only be used in a server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -84,7 +85,7 @@ export class AutoModCommand extends Command {
 
 		if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageGuild)) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You do not have permission to manage automod.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} You do not have permission to manage automod.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -97,7 +98,7 @@ export class AutoModCommand extends Command {
 
 			if (!word) {
 				await interaction.reply({
-					content: `${emojis.rightArrow2} The word cannot be empty or contain only whitespace.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} The word cannot be empty or contain only whitespace.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -111,14 +112,18 @@ export class AutoModCommand extends Command {
 					interaction.client.application.entitlements,
 				);
 				await interaction.reply({
-					content: `${emojis.rightArrow2} The word '${word}' has been added to the automod list.`,
+					embeds: [successEmbed(`${emojis.rightArrow2} The word '${word}' has been added to the automod list.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 			} catch (err) {
 				if (err instanceof LimitError) {
 					if (err.showQuestUnlimitedPrompt) {
 						await interaction.reply({
-							content: `${emojis.questUnlimited2} ${err.message} Unlock unlimited automod rules with QuestUnlimited.`,
+							embeds: [
+								infoEmbed(
+									`${emojis.questUnlimited2} ${err.message} Unlock unlimited automod rules with QuestUnlimited.`,
+								),
+							],
 							components: getQuestUnlimitedPurchaseComponents(interaction.client.application.id),
 							flags: MessageFlags.Ephemeral,
 						});
@@ -126,7 +131,7 @@ export class AutoModCommand extends Command {
 					}
 
 					await interaction.reply({
-						content: `${emojis.rightArrow2} ${err.message}`,
+						embeds: [errorEmbed(`${emojis.rightArrow2} ${err.message}`)],
 						flags: MessageFlags.Ephemeral,
 					});
 					return;
@@ -134,7 +139,7 @@ export class AutoModCommand extends Command {
 
 				if (err instanceof DuplicateAutoModError) {
 					await interaction.reply({
-						content: `${emojis.rightArrow2} ${err.message}`,
+						embeds: [errorEmbed(`${emojis.rightArrow2} ${err.message}`)],
 						flags: MessageFlags.Ephemeral,
 					});
 					return;
@@ -143,7 +148,7 @@ export class AutoModCommand extends Command {
 				console.error(err);
 
 				await interaction.reply({
-					content: `${emojis.rightArrow2} That word is already blocked in this server.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} That word is already blocked in this server.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 			}
@@ -153,7 +158,7 @@ export class AutoModCommand extends Command {
 			const autoMods = await getAutoMods(interaction.guildId);
 			if (autoMods.length === 0) {
 				await interaction.reply({
-					content: `${emojis.rightArrow2} There are no words in the automod list.`,
+					embeds: [infoEmbed(`${emojis.rightArrow2} There are no words in the automod list.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -162,10 +167,10 @@ export class AutoModCommand extends Command {
 			const totalPages = Math.ceil(autoMods.length / 10);
 			let page = 0;
 
-			const buildContent = (page: number) => {
+			const buildEmbed = (page: number) => {
 				const slice = autoMods.slice(page * 10, (page + 1) * 10);
 				const wordList = slice.map((autoMod) => `${emojis.rightArrow1} ${autoMod.word}`).join('\n');
-				return `**Blocked Words** (Page ${page + 1}/${totalPages}):\n${wordList}`;
+				return infoEmbed(`**Blocked Words** (Page ${page + 1}/${totalPages}):\n${wordList}`);
 			};
 
 			const buildRow = (page: number) =>
@@ -184,14 +189,14 @@ export class AutoModCommand extends Command {
 
 			if (totalPages === 1) {
 				await interaction.reply({
-					content: buildContent(0),
+					embeds: [buildEmbed(0)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
 			}
 
 			const response = await interaction.reply({
-				content: buildContent(page),
+				embeds: [buildEmbed(page)],
 				components: [buildRow(page)],
 				flags: MessageFlags.Ephemeral,
 				withResponse: true,
@@ -214,7 +219,7 @@ export class AutoModCommand extends Command {
 				if (btn.customId === 'next') page = Math.min(totalPages - 1, page + 1);
 
 				await btn.update({
-					content: buildContent(page),
+					embeds: [buildEmbed(page)],
 					components: [buildRow(page)],
 				});
 			}
@@ -226,7 +231,7 @@ export class AutoModCommand extends Command {
 
 			if (!autoMod || autoMod.guildId !== interaction.guildId) {
 				await interaction.reply({
-					content: `${emojis.rightArrow2} That blocked word doesn't exist.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} That blocked word doesn't exist.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;
@@ -234,7 +239,9 @@ export class AutoModCommand extends Command {
 
 			await removeAutoMod(autoMod.id);
 			await interaction.reply({
-				content: `${emojis.rightArrow2} The word '${autoMod.word}' has been removed from the automod list.`,
+				embeds: [
+					successEmbed(`${emojis.rightArrow2} The word '${autoMod.word}' has been removed from the automod list.`),
+				],
 				flags: MessageFlags.Ephemeral,
 			});
 		}

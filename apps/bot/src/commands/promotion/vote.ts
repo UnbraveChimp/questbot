@@ -1,5 +1,6 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
+import { infoEmbed } from '#utils/embeds.js';
 
 export class VoteCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -13,7 +14,10 @@ export class VoteCommand extends Command {
 	}
 
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		await interaction.reply(`${emojis.rightArrow1} https://top.gg/bot/1494686224508522579`);
-		await interaction.followUp(`Voting is much appreciated! ❤️`);
+		await interaction.reply({
+			embeds: [
+				infoEmbed(`${emojis.rightArrow1} https://top.gg/bot/1494686224508522579\n\nVoting is much appreciated! ❤️`),
+			],
+		});
 	}
 }

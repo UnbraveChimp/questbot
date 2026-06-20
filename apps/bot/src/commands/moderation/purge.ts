@@ -1,6 +1,7 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
 import { MessageFlags, PermissionsBitField, SlashCommandIntegerOption } from 'discord.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 
 export class PurgeCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -26,7 +27,7 @@ export class PurgeCommand extends Command {
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
 		if (!interaction.inCachedGuild()) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} This command can only be used in a server.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} This command can only be used in a server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -37,7 +38,7 @@ export class PurgeCommand extends Command {
 
 		if (!channel || !('messages' in channel)) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Unable to access channel messages.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} Unable to access channel messages.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -49,7 +50,7 @@ export class PurgeCommand extends Command {
 			!channel.permissionsFor(member)?.has(PermissionsBitField.Flags.ManageMessages)
 		) {
 			await interaction.reply({
-				content: `${emojis.rightArrow2} You do not have permission to manage messages.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} You do not have permission to manage messages.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
@@ -58,16 +59,18 @@ export class PurgeCommand extends Command {
 		const amount = interaction.options.getInteger('amount') ?? 0;
 
 		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-		await interaction.editReply(`${emojis.rightArrow2} Purging ${amount} messages...`);
+		await interaction.editReply({ embeds: [infoEmbed(`${emojis.rightArrow2} Purging ${amount} messages...`)] });
 
 		try {
 			await channel.bulkDelete(amount);
 
-			await interaction.editReply(`${emojis.rightArrow1} Successfully purged ${amount} messages.`);
+			await interaction.editReply({
+				embeds: [successEmbed(`${emojis.rightArrow1} Successfully purged ${amount} messages.`)],
+			});
 		} catch (err) {
 			console.error(err);
 			await interaction.editReply({
-				content: `${emojis.rightArrow2} An error occurred while trying to purge messages.`,
+				embeds: [errorEmbed(`${emojis.rightArrow2} An error occurred while trying to purge messages.`)],
 			});
 		}
 	}

@@ -7,6 +7,7 @@ import {
 } from 'discord.js';
 import { addConfessionBlacklist, removeConfessionBlacklist, isConfessionBlacklisted } from '#lib/confessions.js';
 import { emojis } from '#utils/emoji.js';
+import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class ConfessionBlacklistCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -59,13 +60,17 @@ export class ConfessionBlacklistCommand extends Command {
 			try {
 				await addConfessionBlacklist(user.id, interaction.user.id, reason);
 				await interaction.reply({
-					content: `${emojis.rightArrow2} Blacklisted ${user} from confessions${reason ? ` (reason: ${reason})` : ''}.`,
+					embeds: [
+						successEmbed(
+							`${emojis.rightArrow2} Blacklisted ${user} from confessions${reason ? ` (reason: ${reason})` : ''}.`,
+						),
+					],
 					flags: MessageFlags.Ephemeral,
 				});
 			} catch (err) {
 				console.error(err);
 				await interaction.reply({
-					content: `${emojis.rightArrow2} Failed to blacklist that user.`,
+					embeds: [errorEmbed(`${emojis.rightArrow2} Failed to blacklist that user.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 			}
@@ -74,7 +79,7 @@ export class ConfessionBlacklistCommand extends Command {
 		if (subcommand === 'remove') {
 			await removeConfessionBlacklist(user.id);
 			await interaction.reply({
-				content: `${emojis.rightArrow2} Removed ${user} from the confession blacklist.`,
+				embeds: [successEmbed(`${emojis.rightArrow2} Removed ${user} from the confession blacklist.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 		}
@@ -82,9 +87,13 @@ export class ConfessionBlacklistCommand extends Command {
 		if (subcommand === 'check') {
 			const blacklisted = await isConfessionBlacklisted(user.id);
 			await interaction.reply({
-				content: blacklisted
-					? `${emojis.rightArrow2} ${user} is blacklisted from confessions.`
-					: `${emojis.rightArrow2} ${user} is not blacklisted.`,
+				embeds: [
+					infoEmbed(
+						blacklisted
+							? `${emojis.rightArrow2} ${user} is blacklisted from confessions.`
+							: `${emojis.rightArrow2} ${user} is not blacklisted.`,
+					),
+				],
 				flags: MessageFlags.Ephemeral,
 			});
 		}
