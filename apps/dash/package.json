@@ -13,8 +13,8 @@
     "@questbot/database": "workspace:*",
     "@react-router/node": "7.17.0",
     "@react-router/serve": "7.17.0",
-    "better-auth": "^1.6.14",
-    "isbot": "^5.1.41",
+    "better-auth": "^1.6.20",
+    "isbot": "^5.1.43",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router": "7.17.0",
@@ -24,12 +24,12 @@
   },
   "devDependencies": {
     "@react-router/dev": "7.17.0",
-    "@tailwindcss/vite": "^4.2.2",
+    "@tailwindcss/vite": "^4.3.1",
     "@types/node": "^25",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "dotenv-cli": "^11.0.0",
-    "tailwindcss": "^4.2.2",
+    "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
     "vite": "^8.0.16"
   }
