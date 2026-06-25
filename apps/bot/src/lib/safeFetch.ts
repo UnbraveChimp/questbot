@@ -1,6 +1,6 @@
 import { lookup } from 'node:dns/promises';
 import ipaddr from 'ipaddr.js';
-import { Agent, fetch as undiciFetch } from 'undici';
+import { Agent, request as undiciRequest } from 'undici';
 
 const MAX_REDIRECTS = 3;
 const TIMEOUT_MS = 10_000;
@@ -34,7 +34,16 @@ function validate(url: URL): void {
 	if (url.port && url.port !== '443') throw new SafeFetchError('Port 443 only.');
 }
 
-export async function safeFetch(raw: string, init: RequestInit = {}): Promise<Response> {
+function flattenHeaders(headers: Record<string, string | string[] | undefined>): Record<string, string> {
+	const flat: Record<string, string> = {};
+	for (const [key, val] of Object.entries(headers)) {
+		if (val === undefined) continue;
+		flat[key] = Array.isArray(val) ? val.join(', ') : val;
+	}
+	return flat;
+}
+
+export async function safeFetch(raw: string): Promise<Response> {
 	let url: URL;
 	try {
 		url = new URL(raw);
@@ -42,22 +51,20 @@ export async function safeFetch(raw: string, init: RequestInit = {}): Promise<Re
 		throw new SafeFetchError('Invalid URL.');
 	}
 
-	const agent = new Agent({
-		connect: {
-			lookup: (hostname, _opts, callback) => {
-				resolveValidatedIp(hostname)
-					.then(({ address, family }) => callback(null, address, family))
-					.catch((err: unknown) => callback(err as Error, '', 4));
-			},
-		},
-	});
-
 	for (let i = 0; i <= MAX_REDIRECTS; i++) {
 		validate(url);
 
-		const res = await undiciFetch(url.toString(), {
-			...(init as object),
-			redirect: 'manual',
+		const { address, family } = await resolveValidatedIp(url.hostname).catch((err) => {
+			throw err instanceof SafeFetchError ? err : new SafeFetchError('DNS resolution failed.');
+		});
+
+		const connectUrl = new URL(url.toString());
+		connectUrl.hostname = family === 6 ? `[${address}]` : address;
+
+		const agent = new Agent({ connect: { servername: url.hostname } });
+
+		const { statusCode, headers, body } = await undiciRequest(connectUrl.toString(), {
+			headers: { host: url.host },
 			signal: AbortSignal.timeout(TIMEOUT_MS),
 			dispatcher: agent,
 		}).catch((err: unknown) => {
@@ -65,13 +72,17 @@ export async function safeFetch(raw: string, init: RequestInit = {}): Promise<Re
 			throw new SafeFetchError('Request failed.');
 		});
 
-		if (res.status >= 300 && res.status < 400) {
-			const loc = res.headers.get('location');
-			if (!loc) return res as unknown as Response;
+		if (statusCode >= 300 && statusCode < 400) {
+			await body.dump().catch(() => undefined);
+			const loc = Array.isArray(headers.location) ? headers.location[0] : headers.location;
+			if (!loc) return new Response(null, { status: statusCode, headers: flattenHeaders(headers) });
 			url = new URL(loc, url);
 			continue;
 		}
-		return res as unknown as Response;
+
+		const buffer = await body.arrayBuffer();
+		return new Response(buffer, { status: statusCode, headers: flattenHeaders(headers) });
 	}
+
 	throw new SafeFetchError('Too many redirects.');
 }
