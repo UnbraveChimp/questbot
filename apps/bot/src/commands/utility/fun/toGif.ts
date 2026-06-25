@@ -6,7 +6,8 @@ import { safeFetch, SafeFetchError } from '#lib/safeFetch.js';
 import { errorEmbed } from '#utils/embeds.js';
 
 const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
-const MAX_SIZE = 20 * 1024 * 1024;
+const MAX_SIZE = 8 * 1024 * 1024;
+const MAX_DIMENSION = 800;
 
 export class ToGifCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -72,7 +73,10 @@ export class ToGifCommand extends Command {
 
 		let gifBuffer: Buffer;
 		try {
-			gifBuffer = await sharp(inputBuffer, { failOn: 'error' }).gif().toBuffer();
+			gifBuffer = await sharp(inputBuffer, { failOn: 'error' })
+				.resize(MAX_DIMENSION, MAX_DIMENSION, { fit: 'inside', withoutEnlargement: true })
+				.gif()
+				.toBuffer();
 		} catch {
 			await interaction.editReply({
 				embeds: [errorEmbed(`${emojis.rightArrow1} Failed to convert the image to GIF.`)],
