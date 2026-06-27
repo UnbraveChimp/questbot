@@ -44,9 +44,17 @@ export async function safeFetch(raw: string): Promise<Response> {
 
 	const agent = new Agent({
 		connect: {
-			lookup: (hostname, _opts, callback) => {
+			lookup: (hostname, opts, callback) => {
 				resolveValidatedIp(hostname)
-					.then(({ address, family }) => callback(null, address, family))
+					.then(({ address, family }) => {
+						if (opts.all) {
+							(callback as (err: null, addresses: { address: string; family: number }[]) => void)(null, [
+								{ address, family },
+							]);
+						} else {
+							callback(null, address, family);
+						}
+					})
 					.catch((error: unknown) => callback(error as Error, '', 4));
 			},
 		},
