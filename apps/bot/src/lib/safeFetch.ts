@@ -63,25 +63,27 @@ export async function safeFetch(raw: string): Promise<Response> {
 
 		const agent = new Agent({ connect: { servername: url.hostname } });
 
-		const { statusCode, headers, body } = await undiciRequest(connectUrl.toString(), {
-			headers: { host: url.host },
-			signal: AbortSignal.timeout(TIMEOUT_MS),
-			dispatcher: agent,
-		}).catch((err: unknown) => {
+		try {
+			const { statusCode, headers, body } = await undiciRequest(connectUrl.toString(), {
+				headers: { host: url.host },
+				signal: AbortSignal.timeout(TIMEOUT_MS),
+				dispatcher: agent,
+			});
+
+			if (statusCode >= 300 && statusCode < 400) {
+				await body.dump().catch(() => undefined);
+				const loc = Array.isArray(headers.location) ? headers.location[0] : headers.location;
+				if (!loc) return new Response(null, { status: statusCode, headers: flattenHeaders(headers) });
+				url = new URL(loc, url);
+				continue;
+			}
+
+			const buffer = await body.arrayBuffer();
+			return new Response(buffer, { status: statusCode, headers: flattenHeaders(headers) });
+		} catch (err: unknown) {
 			if (err instanceof SafeFetchError) throw err;
 			throw new SafeFetchError('Request failed.');
-		});
-
-		if (statusCode >= 300 && statusCode < 400) {
-			await body.dump().catch(() => undefined);
-			const loc = Array.isArray(headers.location) ? headers.location[0] : headers.location;
-			if (!loc) return new Response(null, { status: statusCode, headers: flattenHeaders(headers) });
-			url = new URL(loc, url);
-			continue;
 		}
-
-		const buffer = await body.arrayBuffer();
-		return new Response(buffer, { status: statusCode, headers: flattenHeaders(headers) });
 	}
 
 	throw new SafeFetchError('Too many redirects.');
