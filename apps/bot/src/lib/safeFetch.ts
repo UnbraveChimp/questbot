@@ -1,32 +1,71 @@
 import { lookup } from 'node:dns/promises';
+import type { LookupAddress, LookupOptions } from 'node:dns';
+import https from 'node:https';
+import http from 'node:http';
+import { Readable } from 'node:stream';
 import ipaddr from 'ipaddr.js';
-import { Agent, fetch as undiciFetch } from 'undici';
 
 const MAX_REDIRECTS = 3;
 const TIMEOUT_MS = 10_000;
 
 export class SafeFetchError extends Error {}
 
-async function resolveValidatedIp(hostname: string): Promise<{ address: string; family: 4 | 6 }> {
-	if (ipaddr.isValid(hostname)) {
-		const parsed = ipaddr.parse(hostname);
-		if (parsed.range() !== 'unicast') {
-			throw new SafeFetchError(`Blocked address range for ${hostname}`);
+type LookupCallback = ((err: NodeJS.ErrnoException | null, address: string, family: number) => void) &
+	((err: NodeJS.ErrnoException | null, addresses: LookupAddress[]) => void);
+
+function safeLookup(hostname: string, options: LookupOptions, callback: LookupCallback): void {
+	lookup(hostname, { all: true })
+		.then(records => {
+			if (records.length === 0) {
+				callback(new SafeFetchError(`No DNS records for ${hostname}`) as NodeJS.ErrnoException, '', 4);
+				return;
+			}
+			for (const { address } of records) {
+				if (ipaddr.parse(address).range() !== 'unicast') {
+					callback(new SafeFetchError(`Blocked address range for ${hostname}`) as NodeJS.ErrnoException, '', 4);
+					return;
+				}
+			}
+			if (options.all) {
+				(callback as (err: null, addresses: LookupAddress[]) => void)(null, records);
+			} else {
+				const { address, family } = records[0];
+				callback(null, address, family);
+			}
+		})
+		.catch((error: unknown) => callback(error as NodeJS.ErrnoException, '', 4));
+}
+
+function toResponse(msg: http.IncomingMessage): Response {
+	const headers: Record<string, string> = {};
+	for (const [key, value] of Object.entries(msg.headers)) {
+		if (value !== undefined) {
+			headers[key] = Array.isArray(value) ? value.join(', ') : value;
 		}
-		return { address: hostname, family: parsed.kind() === 'ipv4' ? 4 : 6 };
 	}
+	return new Response(Readable.toWeb(msg) as ReadableStream, {
+		status: msg.statusCode ?? 200,
+		headers,
+	});
+}
 
-	const records = await lookup(hostname, { all: true });
-	if (records.length === 0) throw new SafeFetchError(`No DNS records for ${hostname}`);
-
-	for (const { address } of records) {
-		if (ipaddr.parse(address).range() !== 'unicast') {
-			throw new SafeFetchError(`Blocked address range for ${hostname}`);
-		}
-	}
-
-	const { address, family } = records[0];
-	return { address, family: family as 4 | 6 };
+function request(url: URL): Promise<http.IncomingMessage> {
+	return new Promise((resolve, reject) => {
+		const req = https.request(
+			{
+				hostname: url.hostname,
+				port: url.port || 443,
+				path: url.pathname + url.search,
+				method: 'GET',
+				lookup: safeLookup,
+				timeout: TIMEOUT_MS,
+			},
+			resolve,
+		);
+		req.on('timeout', () => req.destroy(new SafeFetchError('Request timed out.')));
+		req.on('error', error => reject(error instanceof SafeFetchError ? error : new SafeFetchError('Request failed.')));
+		req.end();
+	});
 }
 
 function validate(url: URL): void {
@@ -42,46 +81,20 @@ export async function safeFetch(raw: string): Promise<Response> {
 		throw new SafeFetchError('Invalid URL.');
 	}
 
-	const agent = new Agent({
-		connect: {
-			lookup: (hostname, opts, callback) => {
-				resolveValidatedIp(hostname)
-					.then(({ address, family }) => {
-						if (opts.all) {
-							(callback as (err: null, addresses: { address: string; family: number }[]) => void)(null, [
-								{ address, family },
-							]);
-						} else {
-							callback(null, address, family);
-						}
-					})
-					.catch((error: unknown) => callback(error as Error, '', 4));
-			},
-		},
-	});
-
 	for (let i = 0; i <= MAX_REDIRECTS; i++) {
 		validate(url);
 
-		try {
-			const res = await undiciFetch(url.toString(), {
-				redirect: 'manual',
-				signal: AbortSignal.timeout(TIMEOUT_MS),
-				dispatcher: agent,
-			});
+		const msg = await request(url);
 
-			if (res.status >= 300 && res.status < 400) {
-				const loc = res.headers.get('location');
-				if (!loc) return res as unknown as Response;
-				url = new URL(loc, url);
-				continue;
-			}
-
-			return res as unknown as Response;
-		} catch (err: unknown) {
-			if (err instanceof SafeFetchError) throw err;
-			throw new SafeFetchError('Request failed.');
+		if (msg.statusCode !== undefined && msg.statusCode >= 300 && msg.statusCode < 400) {
+			const loc = msg.headers.location;
+			if (!loc) return toResponse(msg);
+			msg.resume();
+			url = new URL(loc, url);
+			continue;
 		}
+
+		return toResponse(msg);
 	}
 
 	throw new SafeFetchError('Too many redirects.');
