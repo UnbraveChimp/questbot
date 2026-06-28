@@ -23,7 +23,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "@react-router/dev": "7.18.0",
+    "@react-router/dev": "8.0.1",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^25",
     "@types/react": "^19.2.17",
