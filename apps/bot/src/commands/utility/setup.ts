@@ -29,7 +29,7 @@ function isStaleInteractionError(error: unknown): error is { code: number } {
 	);
 }
 
-const STEP_TIMEOUT = 90_000;
+const STEP_TIMEOUT = 180_000;
 
 function yesNoRow() {
 	return new ActionRowBuilder<ButtonBuilder>().addComponents(
