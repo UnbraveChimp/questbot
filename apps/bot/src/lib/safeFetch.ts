@@ -15,7 +15,7 @@ type LookupCallback = ((err: NodeJS.ErrnoException | null, address: string, fami
 
 function safeLookup(hostname: string, options: LookupOptions, callback: LookupCallback): void {
 	lookup(hostname, { all: true })
-		.then(records => {
+		.then((records) => {
 			if (records.length === 0) {
 				callback(new SafeFetchError(`No DNS records for ${hostname}`) as NodeJS.ErrnoException, '', 4);
 				return;
@@ -63,7 +63,7 @@ function request(url: URL): Promise<http.IncomingMessage> {
 			resolve,
 		);
 		req.on('timeout', () => req.destroy(new SafeFetchError('Request timed out.')));
-		req.on('error', error => reject(error instanceof SafeFetchError ? error : new SafeFetchError('Request failed.')));
+		req.on('error', (error) => reject(error instanceof SafeFetchError ? error : new SafeFetchError('Request failed.')));
 		req.end();
 	});
 }

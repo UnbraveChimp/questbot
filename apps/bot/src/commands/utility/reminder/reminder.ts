@@ -85,10 +85,6 @@ export class ReminderCommand extends Command {
 					],
 					allowedMentions: { parse: [] },
 				});
-
-				setTimeout(() => {
-					interaction.deleteReply().catch(() => {});
-				}, 5000);
 				return;
 			} catch (err) {
 				console.error(err);
