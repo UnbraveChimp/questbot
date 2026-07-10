@@ -14,15 +14,17 @@
 | Limits        | :x:                |
 | DDOS/DOS      | :x:                |
 
-If it is *critical* please submit it.
+We do not fix vulnerabilities in upstream packages directly. If the issue meaningfully affects Quest Bot report it here too.
+
+If it is *critical* please submit it regardless of the terms stated above.
 
 ## Reporting a Vulnerability
 
-Please report vulnerabilties through Github Advisories.
+Please report vulnerabilities through Github Advisories.
 
 Don't be afraid to report a vulnerability! If we have to close it there are no consequences!
 
 If a vulnerability is of high severity it will be looked into reasonably fast.
-Vulnerabilties get accepted and denied all the time, if your vulnerability is denied
-and you believe it was denied falsely than you can either reopen it or create a new one
+Vulnerabilities get accepted and denied all the time. If your vulnerability is denied
+and you believe it was denied falsely then you can either reopen it or create a new one
 if it is of high priority.

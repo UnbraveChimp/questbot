@@ -1,6 +1,6 @@
 import { Listener } from '@sapphire/framework';
 import { Events, type Message } from 'discord.js';
-import { getAutoMods } from '#lib/automod.js';
+import { containsBlockedWord } from '#lib/automod.js';
 import { isHaiku } from '#lib/haiku.js';
 import { getSettings } from '#lib/settings.js';
 
@@ -24,22 +24,15 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 
 		if (message.author.bot) return;
 
-		const autoMods = await getAutoMods(message.guild.id);
+		if (await containsBlockedWord(message.guild.id, message.content)) {
+			await message.delete().catch((err) => console.error(err));
 
-		for (const autoMod of autoMods) {
-			if (!autoMod.word.trim()) continue;
-			if (content.includes(autoMod.word.toLowerCase())) {
-				await message.delete().catch((err) => console.error(err));
+			const channel = message.channel;
+			if (!channel.isTextBased() || !channel.isSendable()) return;
 
-				const channel = message.channel;
-				if (!channel.isTextBased() || !channel.isSendable()) return;
-
-				await channel.send(`<@${message.author.id}>, that word is not allowed here!`).catch((err) => {
-					console.error(err);
-				});
-
-				break;
-			}
+			await channel.send(`<@${message.author.id}>, that word is not allowed here!`).catch((err) => {
+				console.error(err);
+			});
 		}
 
 		const moderatorIds = [

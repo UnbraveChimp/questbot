@@ -84,6 +84,7 @@ model Server {
   autoroles      AutoRole[]
   automods       AutoMod[]
   confessions    Confession[]
+  afks           Afk[]
 
   @@map("server")
 }
@@ -208,4 +209,18 @@ model ConfessionBlacklist {
   reason    String?
   createdAt DateTime @default(now())
   createdBy String
+}
+
+model Afk {
+  id        String   @id @default(cuid())
+  guildId   String
+  userId    String
+  message   String?
+  createdAt DateTime @default(now())
+
+  server    Server   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, userId])
+  @@index([guildId])
+  @@map("afks")
 }

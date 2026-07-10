@@ -21,7 +21,10 @@ export class EmojiUpdateListener extends Listener<typeof Events.GuildEmojiUpdate
 			.setTimestamp();
 
 		if (oldEmoji.name !== newEmoji.name) {
-			embed.addFields({ name: 'Before', value: `\`${oldEmoji.name}\`` }, { name: 'After', value: `\`${newEmoji.name}\`` });
+			embed.addFields(
+				{ name: 'Before', value: `\`${oldEmoji.name}\`` },
+				{ name: 'After', value: `\`${newEmoji.name}\`` },
+			);
 		}
 
 		if (auditEntry?.executor) {

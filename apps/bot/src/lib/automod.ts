@@ -75,6 +75,12 @@ export async function getAutoMods(guildId: string) {
 	});
 }
 
+export async function containsBlockedWord(guildId: string, text: string): Promise<boolean> {
+	const autoMods = await getAutoMods(guildId);
+	const lowerText = text.toLowerCase();
+	return autoMods.some((autoMod) => autoMod.word.trim() && lowerText.includes(autoMod.word.toLowerCase()));
+}
+
 export async function removeAutoMod(autoModId: string) {
 	return prisma.autoMod.delete({ where: { id: autoModId } });
 }
