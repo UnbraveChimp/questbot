@@ -12,7 +12,7 @@
     "@mdx-js/rollup": "^3.1.1",
     "@questbot/database": "workspace:*",
     "@react-router/node": "8.0.1",
-    "@react-router/serve": "7.18.0",
+    "@react-router/serve": "8.1.0",
     "better-auth": "^1.6.20",
     "isbot": "^5.1.44",
     "react": "^19.2.7",
