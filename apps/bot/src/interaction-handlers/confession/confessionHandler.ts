@@ -243,23 +243,34 @@ export class ConfessionButtonHandler extends InteractionHandler {
 			return;
 		}
 
-		const context =
-			parsed.guildId && parsed.channelId && parsed.messageId
-				? { guildId: parsed.guildId, channelId: parsed.channelId, messageId: parsed.messageId, threadId: '' }
-				: await getConfessionContext(parsed.messageId);
-
-		if (!context) {
-			await interaction.reply({
-				content: `${emojis.rightArrow2} This confession is no longer available.`,
-			});
-			return;
-		}
-
 		const moderatorIds = getModeratorIds();
 
 		if (!moderatorIds.includes(interaction.user.id)) {
 			await interaction.reply({
 				content: `${emojis.rightArrow2} You are not configured as a bot moderator.`,
+			});
+			return;
+		}
+
+		await interaction.deferReply();
+
+		let storedContext = null;
+
+		try {
+			storedContext = await getConfessionContext(parsed.messageId);
+		} catch (error) {
+			console.error('Failed to fetch confession context', { messageId: parsed.messageId, error });
+		}
+
+		const context =
+			storedContext ??
+			(parsed.guildId && parsed.channelId
+				? { guildId: parsed.guildId, channelId: parsed.channelId, messageId: parsed.messageId, threadId: '' }
+				: null);
+
+		if (!context) {
+			await interaction.editReply({
+				content: `${emojis.rightArrow2} This confession is no longer available.`,
 			});
 			return;
 		}
@@ -275,7 +286,7 @@ export class ConfessionButtonHandler extends InteractionHandler {
 
 			await removeConfessionContext(context.messageId);
 
-			await interaction.reply({
+			await interaction.editReply({
 				content: `${emojis.rightArrow2} The confession channel (<#${context.channelId}>) is no longer available, but the confession has been removed from records.`,
 			});
 			return;
@@ -286,7 +297,7 @@ export class ConfessionButtonHandler extends InteractionHandler {
 		if (!message) {
 			await removeConfessionContext(context.messageId);
 
-			await interaction.reply({
+			await interaction.editReply({
 				content: `${emojis.rightArrow2} That confession no longer exists, but the record has been cleaned up.`,
 			});
 			return;
@@ -301,7 +312,7 @@ export class ConfessionButtonHandler extends InteractionHandler {
 		try {
 			await message.edit({ embeds: [deletedEmbed], components: [] });
 		} catch {
-			await interaction.reply({
+			await interaction.editReply({
 				content: `${emojis.rightArrow2} I could not update the confession message.`,
 			});
 			return;
@@ -320,7 +331,7 @@ export class ConfessionButtonHandler extends InteractionHandler {
 
 		await removeConfessionContext(context.messageId);
 
-		await interaction.reply({
+		await interaction.editReply({
 			content: `${emojis.rightArrow1} Confession marked as deleted.`,
 		});
 	}
