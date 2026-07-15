@@ -16,7 +16,7 @@
 		"clean": "turbo run build --force && rm -rf node_modules apps/*/node_modules dist .turbo"
 	},
 	"dependencies": {
-		"discord.js": "^14.26.4"
+		"discord.js": "^14.26.5"
 	},
 	"engines": {
 		"node": ">=22.12.0"
