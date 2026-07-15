@@ -1,6 +1,6 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
-import { MessageFlags, PermissionsBitField, SlashCommandIntegerOption } from 'discord.js';
+import { MessageFlags, PermissionsBitField, Routes, SlashCommandIntegerOption } from 'discord.js';
 import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 
 export class PurgeCommand extends Command {
@@ -62,10 +62,21 @@ export class PurgeCommand extends Command {
 		await interaction.editReply({ embeds: [infoEmbed(`${emojis.rightArrow2} Purging ${amount} messages...`)] });
 
 		try {
-			await channel.bulkDelete(amount);
+			const reason = `Purged by ${interaction.user.tag} (${interaction.user.id})`;
+			const messages = await channel.messages.fetch({ limit: amount });
+			const messageIds = [...messages.keys()];
+
+			if (messageIds.length === 1) {
+				await channel.client.rest.delete(Routes.channelMessage(channel.id, messageIds[0]), { reason });
+			} else if (messageIds.length > 1) {
+				await channel.client.rest.post(Routes.channelBulkDelete(channel.id), {
+					body: { messages: messageIds },
+					reason,
+				});
+			}
 
 			await interaction.editReply({
-				embeds: [successEmbed(`${emojis.rightArrow1} Successfully purged ${amount} messages.`)],
+				embeds: [successEmbed(`${emojis.rightArrow1} Successfully purged ${messageIds.length} messages.`)],
 			});
 		} catch (err) {
 			console.error(err);
