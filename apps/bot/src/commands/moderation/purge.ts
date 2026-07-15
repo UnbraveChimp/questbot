@@ -1,7 +1,8 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
-import { MessageFlags, PermissionsBitField, Routes, SlashCommandIntegerOption } from 'discord.js';
+import { EmbedBuilder, MessageFlags, PermissionsBitField, Routes, SlashCommandIntegerOption } from 'discord.js';
 import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
+import { logEmbed } from '#lib/logging.js';
 
 export class PurgeCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -62,18 +63,26 @@ export class PurgeCommand extends Command {
 		await interaction.editReply({ embeds: [infoEmbed(`${emojis.rightArrow2} Purging ${amount} messages...`)] });
 
 		try {
-			const reason = `Purged by ${interaction.user.tag} (${interaction.user.id})`;
 			const messages = await channel.messages.fetch({ limit: amount });
 			const messageIds = [...messages.keys()];
 
 			if (messageIds.length === 1) {
-				await channel.client.rest.delete(Routes.channelMessage(channel.id, messageIds[0]), { reason });
+				await channel.client.rest.delete(Routes.channelMessage(channel.id, messageIds[0]));
 			} else if (messageIds.length > 1) {
-				await channel.client.rest.post(Routes.channelBulkDelete(channel.id), {
-					body: { messages: messageIds },
-					reason,
-				});
+				await channel.client.rest.post(Routes.channelBulkDelete(channel.id), { body: { messages: messageIds } });
 			}
+
+			const logEntry = new EmbedBuilder()
+				.setTitle('Purged')
+				.setColor(0xff6962)
+				.addFields(
+					{ name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
+					{ name: 'Channel', value: channel.toString(), inline: true },
+					{ name: 'Count', value: `${messageIds.length}`, inline: true },
+				)
+				.setTimestamp();
+
+			await logEmbed(interaction.guild, logEntry);
 
 			await interaction.editReply({
 				embeds: [successEmbed(`${emojis.rightArrow1} Successfully purged ${messageIds.length} messages.`)],
