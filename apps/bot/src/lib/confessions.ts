@@ -19,10 +19,6 @@ export function getModeratorIds() {
 	];
 }
 
-export function buildConfessionLink(guildId: string, channelId: string, messageId: string) {
-	return `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
-}
-
 export async function storeConfessionContext(context: ConfessionContext) {
 	await prisma.confession.upsert({
 		where: { messageId: context.messageId },

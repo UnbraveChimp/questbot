@@ -13,7 +13,6 @@ import {
 } from 'discord.js';
 import {
 	getModeratorIds,
-	buildConfessionLink,
 	getConfessionContext,
 	removeConfessionContext,
 } from '#lib/confessions.js';
@@ -185,7 +184,7 @@ export class ConfessionButtonHandler extends InteractionHandler {
 			.setStyle(ButtonStyle.Danger);
 
 		const confessionText = message.embeds[0]?.description ?? 'No confession content was found.';
-		const link = buildConfessionLink(context.guildId, context.channelId, context.messageId);
+		const link = `https://discord.com/channels/${context.guildId}/${context.channelId}/${context.messageId}`;
 
 		let confessorDisplay = 'Unknown';
 		if (context.creatorId) {

@@ -1,6 +1,6 @@
 import { Command } from '@sapphire/framework';
 import { emojis } from '#utils/emoji.js';
-import { EmbedBuilder, MessageFlags, PermissionsBitField, Routes, SlashCommandIntegerOption } from 'discord.js';
+import { EmbedBuilder, MessageFlags, PermissionsBitField } from 'discord.js';
 import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { logEmbed } from '#lib/logging.js';
 
@@ -14,13 +14,42 @@ export class PurgeCommand extends Command {
 			builder
 				.setName('purge')
 				.setDescription('Purge messages up to 14d old from a channel.')
-				.addIntegerOption((option: SlashCommandIntegerOption) =>
+				.addIntegerOption((option) =>
 					option
 						.setName('amount')
 						.setDescription('The number of messages to purge')
 						.setRequired(true)
-						.setMinValue(1)
-						.setMaxValue(100),
+						.setMinValue(1),
+				)
+				.addBooleanOption((option) =>
+					option
+						.setName('images')
+						.setDescription('Set to true to only purge messages with images.')
+						.setRequired(false),
+				)
+				.addBooleanOption((option) =>
+					option
+						.setName('bots')
+						.setDescription('Set to true to only purge messages from bots.')
+						.setRequired(false),
+				)
+				.addBooleanOption((option) =>
+					option
+						.setName('users')
+						.setDescription('Set to true to only purge messages from users.')
+						.setRequired(false),
+				)
+				.addUserOption((option) =>
+					option
+						.setName('user')
+						.setDescription('The user whose messages to purge.')
+						.setRequired(false),
+				)
+				.addRoleOption((option) =>
+					option
+						.setName('role')
+						.setDescription('The role whose messages to purge.')
+						.setRequired(false),
 				),
 		);
 	}
@@ -57,19 +86,60 @@ export class PurgeCommand extends Command {
 			return;
 		}
 
-		const amount = interaction.options.getInteger('amount') ?? 0;
+		const amount = interaction.options.getInteger('amount', true);
+		const images = interaction.options.getBoolean('images') ?? false;
+		const bots = interaction.options.getBoolean('bots') ?? false;
+		const users = interaction.options.getBoolean('users') ?? false;
+		const user = interaction.options.getUser('user');
+		const role = interaction.options.getRole('role');
+
+		if (bots && users) {
+			await interaction.reply({
+				embeds: [errorEmbed(`${emojis.rightArrow2} The bots and users filters be enabled simultaneously.`)],
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
 
 		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 		await interaction.editReply({ embeds: [infoEmbed(`${emojis.rightArrow2} Purging ${amount} messages...`)] });
 
 		try {
-			const messages = await channel.messages.fetch({ limit: amount });
-			const messageIds = [...messages.keys()];
+			let deletedCount = 0;
+			let before: string | undefined;
 
-			if (messageIds.length === 1) {
-				await channel.client.rest.delete(Routes.channelMessage(channel.id, messageIds[0]));
-			} else if (messageIds.length > 1) {
-				await channel.client.rest.post(Routes.channelBulkDelete(channel.id), { body: { messages: messageIds } });
+			while (deletedCount < amount) {
+				const messages = await channel.messages.fetch({
+					limit: 100,
+					...(before && { before }),
+				});
+
+				if (messages.size === 0) break;
+
+				before = messages.last()?.id;
+				const matches = messages
+					.filter(
+						(message) =>
+							(!images || message.attachments.some((attachment) => attachment.contentType?.startsWith('image/'))) &&
+							(!bots || message.author.bot) &&
+							(!users || !message.author.bot) &&
+							(!user || message.author.id === user.id) &&
+							(!role || message.member?.roles.cache.has(role.id) === true),
+					)
+					.first(amount - deletedCount);
+
+				if (matches.length > 0) {
+					const deleted = await channel.bulkDelete(matches, true);
+					deletedCount += deleted.size;
+
+					await interaction.editReply({
+						embeds: [infoEmbed(`${emojis.rightArrow2} Purged ${deletedCount}/${amount} messages...`)],
+					});
+
+					if (deleted.size < matches.length) break;
+				}
+
+				if (messages.size < 100) break;
 			}
 
 			const logEntry = new EmbedBuilder()
@@ -78,14 +148,14 @@ export class PurgeCommand extends Command {
 				.addFields(
 					{ name: 'Moderator', value: `<@${interaction.user.id}>`, inline: true },
 					{ name: 'Channel', value: channel.toString(), inline: true },
-					{ name: 'Count', value: `${messageIds.length}`, inline: true },
+					{ name: 'Count', value: `${deletedCount}`, inline: true },
 				)
 				.setTimestamp();
 
 			await logEmbed(interaction.guild, logEntry);
 
 			await interaction.editReply({
-				embeds: [successEmbed(`${emojis.rightArrow1} Successfully purged ${messageIds.length} messages.`)],
+				embeds: [successEmbed(`${emojis.rightArrow1} Successfully purged ${deletedCount} messages.`)],
 			});
 		} catch (err) {
 			console.error(err);

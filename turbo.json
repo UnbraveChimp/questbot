@@ -1,5 +1,6 @@
 {
   "$schema": "https://v2-10-5.turborepo.dev/schema.json",
+  "envMode": "loose",
   "globalDependencies": [".env", "pnpm-lock.yaml"],
   "tasks": {
     "build": {
