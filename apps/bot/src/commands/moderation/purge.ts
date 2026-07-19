@@ -19,7 +19,8 @@ export class PurgeCommand extends Command {
 						.setName('amount')
 						.setDescription('The number of messages to purge')
 						.setRequired(true)
-						.setMinValue(1),
+						.setMinValue(1)
+						.setMaxValue(1000),
 				)
 				.addBooleanOption((option) =>
 					option
