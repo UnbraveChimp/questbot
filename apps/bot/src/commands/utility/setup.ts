@@ -96,7 +96,8 @@ export class SetupCommand extends Command {
 		}
 
 		const { guildId, guild } = interaction;
-		const collectorFilter = (i: { user: { id: string } }) => i.user.id === interaction.user.id;
+		const collectorFilter = (i: MessageComponentInteraction) =>
+			i.user.id === interaction.user.id && (i.memberPermissions?.has(PermissionFlagsBits.Administrator) ?? false);
 
 		const safeEditReply = async (options: Parameters<Command.ChatInputCommandInteraction['editReply']>[0]) => {
 			try {

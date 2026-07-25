@@ -8,6 +8,7 @@ import {
 	type Guild,
 	InteractionContextType,
 	MessageFlags,
+	type MessageComponentInteraction,
 	PermissionFlagsBits,
 	RoleSelectMenuBuilder,
 	StringSelectMenuBuilder,
@@ -308,7 +309,8 @@ export class SettingsCommand extends Command {
 			withResponse: true,
 		});
 
-		const collectorFilter = (i: { user: { id: string } }) => i.user.id === interaction.user.id;
+		const collectorFilter = (i: MessageComponentInteraction) =>
+			i.user.id === interaction.user.id && (i.memberPermissions?.has(PermissionFlagsBits.Administrator) ?? false);
 
 		try {
 			const settingChoice = await import('#utils/collectors.js').then((m) =>
