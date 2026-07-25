@@ -65,6 +65,36 @@ export class UnwarnCommand extends Command {
 			return;
 		}
 
+		if (warn.userId === interaction.user.id) {
+			await interaction.reply({
+				embeds: [errorEmbed(`${emojis.rightArrow2} You cannot remove your own warns.`)],
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
+
+		const targetMember =
+			interaction.guild.members.cache.get(warn.userId) ??
+			(await interaction.guild.members.fetch(warn.userId).catch(() => null));
+
+		if (targetMember) {
+			if (targetMember.id === interaction.guild.ownerId) {
+				await interaction.reply({
+					embeds: [errorEmbed(`${emojis.rightArrow2} You cannot remove the server owner's warns.`)],
+					flags: MessageFlags.Ephemeral,
+				});
+				return;
+			}
+
+			if (member.roles.highest.position <= targetMember.roles.highest.position) {
+				await interaction.reply({
+					embeds: [errorEmbed(`${emojis.rightArrow2} You cannot moderate someone with a higher or equal role.`)],
+					flags: MessageFlags.Ephemeral,
+				});
+				return;
+			}
+		}
+
 		const confirm = new ButtonBuilder().setCustomId('confirm').setLabel('Confirm Unwarn').setStyle(ButtonStyle.Danger);
 		const cancel = new ButtonBuilder().setCustomId('cancel').setLabel('Cancel').setStyle(ButtonStyle.Secondary);
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(cancel, confirm);
