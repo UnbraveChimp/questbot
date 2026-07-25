@@ -2,7 +2,7 @@ import { Command } from '@sapphire/framework';
 import { AttachmentBuilder, SlashCommandStringOption } from 'discord.js';
 import sharp from 'sharp';
 import { emojis } from '#utils/emoji.js';
-import { safeFetch, SafeFetchError } from '#lib/safeFetch.js';
+import { safeFetch, readLimited, SafeFetchError } from '#lib/safeFetch.js';
 import { errorEmbed } from '#utils/embeds.js';
 
 const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
@@ -57,19 +57,20 @@ export class ToGifCommand extends Command {
 		const contentLength = response.headers.get('content-length');
 		if (contentLength && parseInt(contentLength, 10) > MAX_SIZE) {
 			await interaction.editReply({
-				embeds: [errorEmbed(`${emojis.rightArrow1} Image exceeds the 20 MB size limit.`)],
+				embeds: [errorEmbed(`${emojis.rightArrow1} Image exceeds the 8 MB size limit.`)],
 			});
 			return;
 		}
 
-		const arrayBuffer = await response.arrayBuffer();
-		if (arrayBuffer.byteLength > MAX_SIZE) {
+		let inputBuffer: Buffer;
+		try {
+			inputBuffer = await readLimited(response, MAX_SIZE);
+		} catch {
 			await interaction.editReply({
-				embeds: [errorEmbed(`${emojis.rightArrow1} Image exceeds the 20 MB size limit.`)],
+				embeds: [errorEmbed(`${emojis.rightArrow1} Image exceeds the 8 MB size limit.`)],
 			});
 			return;
 		}
-		const inputBuffer = Buffer.from(arrayBuffer);
 
 		let gifBuffer: Buffer;
 		try {

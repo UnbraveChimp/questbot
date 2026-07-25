@@ -73,6 +73,29 @@ function validate(url: URL): void {
 	if (url.port && url.port !== '443') throw new SafeFetchError('Port 443 only.');
 }
 
+export async function readLimited(response: Response, maxBytes: number): Promise<Buffer> {
+	const reader = response.body?.getReader();
+	if (!reader) return Buffer.alloc(0);
+
+	const chunks: Uint8Array[] = [];
+	let total = 0;
+
+	for (;;) {
+		const { done, value } = await reader.read();
+		if (done) break;
+
+		total += value.byteLength;
+		if (total > maxBytes) {
+			await reader.cancel();
+			throw new SafeFetchError('Response exceeds the max size.');
+		}
+
+		chunks.push(value);
+	}
+
+	return Buffer.concat(chunks);
+}
+
 export async function safeFetch(raw: string): Promise<Response> {
 	let url: URL;
 	try {
