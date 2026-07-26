@@ -63,9 +63,8 @@ export class MuteCommand extends Command {
 
 		const targetMember = interaction.options.getMember('member') as GuildMember;
 		const reason = interaction.options.getString('reason') ?? 'No reason provided';
-		const durationStr = interaction.options.getString('duration') as StringValue;
-		const duration = durationStr ? ms(durationStr) : null;
-		const expiresAt = duration ? new Date(Date.now() + duration) : null;
+		const durationStr = interaction.options.getString('duration', true) as StringValue;
+		const duration = ms(durationStr);
 
 		if (!targetMember) {
 			await interaction.reply({
@@ -75,7 +74,7 @@ export class MuteCommand extends Command {
 			return;
 		}
 
-		if (durationStr && (typeof duration !== 'number' || isNaN(duration))) {
+		if (typeof duration !== 'number' || isNaN(duration) || duration <= 0) {
 			await interaction.reply({
 				embeds: [errorEmbed(`${emojis.rightArrow2} Invalid duration format.`)],
 				flags: MessageFlags.Ephemeral,
@@ -83,14 +82,16 @@ export class MuteCommand extends Command {
 			return;
 		}
 
-		const year = ms('180d');
-		if (duration !== null && duration > year) {
+		const max = ms('180d');
+		if (duration > max) {
 			await interaction.reply({
 				embeds: [errorEmbed(`${emojis.rightArrow2} Mute duration cannot exceed 180 days.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
+
+		const expiresAt = new Date(Date.now() + duration);
 
 		if (targetMember.id === interaction.user.id) {
 			await interaction.reply({
