@@ -11,11 +11,7 @@ import {
 	TextInputStyle,
 	type ButtonInteraction,
 } from 'discord.js';
-import {
-	getModeratorIds,
-	getConfessionContext,
-	removeConfessionContext,
-} from '#lib/confessions.js';
+import { getModeratorIds, getConfessionContext, removeConfessionContext } from '#lib/confessions.js';
 import { emojis } from '#utils/emoji.js';
 
 interface ParsedConfessionButton {

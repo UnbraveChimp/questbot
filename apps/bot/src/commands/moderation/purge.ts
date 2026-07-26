@@ -23,34 +23,19 @@ export class PurgeCommand extends Command {
 						.setMaxValue(1000),
 				)
 				.addBooleanOption((option) =>
-					option
-						.setName('images')
-						.setDescription('Set to true to only purge messages with images.')
-						.setRequired(false),
+					option.setName('images').setDescription('Set to true to only purge messages with images.').setRequired(false),
 				)
 				.addBooleanOption((option) =>
-					option
-						.setName('bots')
-						.setDescription('Set to true to only purge messages from bots.')
-						.setRequired(false),
+					option.setName('bots').setDescription('Set to true to only purge messages from bots.').setRequired(false),
 				)
 				.addBooleanOption((option) =>
-					option
-						.setName('users')
-						.setDescription('Set to true to only purge messages from users.')
-						.setRequired(false),
+					option.setName('users').setDescription('Set to true to only purge messages from users.').setRequired(false),
 				)
 				.addUserOption((option) =>
-					option
-						.setName('user')
-						.setDescription('The user whose messages to purge.')
-						.setRequired(false),
+					option.setName('user').setDescription('The user whose messages to purge.').setRequired(false),
 				)
 				.addRoleOption((option) =>
-					option
-						.setName('role')
-						.setDescription('The role whose messages to purge.')
-						.setRequired(false),
+					option.setName('role').setDescription('The role whose messages to purge.').setRequired(false),
 				),
 		);
 	}
