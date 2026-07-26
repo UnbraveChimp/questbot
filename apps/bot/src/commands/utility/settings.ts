@@ -7,18 +7,18 @@ import {
 	ChannelType,
 	type Guild,
 	InteractionContextType,
-	MessageFlags,
 	type MessageComponentInteraction,
+	MessageFlags,
 	PermissionFlagsBits,
 	RoleSelectMenuBuilder,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 } from 'discord.js';
 import { getSettings, type ServerSettings, updateSettings } from '#lib/settings.js';
-import { emojis } from '#utils/emoji.js';
 import { errorEmbed, infoEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
-const staleInteractionErrorCodes = new Set([10_015, 50_027, 10062]);
+const STALE_INTERACTION_ERROR_CODES = new Set([10_015, 50_027, 10062]);
 
 function isStaleInteractionError(error: unknown): error is { code: number } {
 	return (
@@ -26,7 +26,7 @@ function isStaleInteractionError(error: unknown): error is { code: number } {
 		error !== null &&
 		'code' in error &&
 		typeof error.code === 'number' &&
-		staleInteractionErrorCodes.has(error.code)
+		STALE_INTERACTION_ERROR_CODES.has(error.code)
 	);
 }
 
@@ -258,7 +258,7 @@ export class SettingsCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('settings')
 				.setDescription("Configure the bot's settings for this server.")

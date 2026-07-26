@@ -1,6 +1,6 @@
 import { Command } from '@sapphire/framework';
-import { emojis } from '#utils/emoji.js';
 import { infoEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class UserCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

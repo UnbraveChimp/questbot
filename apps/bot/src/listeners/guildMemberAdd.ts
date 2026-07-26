@@ -1,7 +1,7 @@
 import { Listener } from '@sapphire/framework';
-import { Events, PermissionFlagsBits, type GuildMember } from 'discord.js';
-import { enforceMute } from '#lib/mutes.js';
+import { Events, type GuildMember, PermissionFlagsBits } from 'discord.js';
 import { getAutoRoles } from '#lib/autorole.js';
+import { enforceMute } from '#lib/mutes.js';
 import { sendWelcome } from '#lib/welcomeModule.js';
 
 export class GuildMemberAddListener extends Listener<typeof Events.GuildMemberAdd> {

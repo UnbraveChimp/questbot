@@ -3,16 +3,16 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	GuildMember,
+	type GuildMember,
 	MessageFlags,
-	PermissionsBitField,
 	PermissionFlagsBits,
-	SlashCommandUserOption,
-	SlashCommandStringOption,
+	PermissionsBitField,
+	type SlashCommandStringOption,
+	type SlashCommandUserOption,
 } from 'discord.js';
 import { removeMute } from '#lib/mutes.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { emojis } from '#utils/emoji.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class UnmuteCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

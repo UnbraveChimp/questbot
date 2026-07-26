@@ -9,12 +9,12 @@ export async function createWarn(
 	expiresAt: Date | null = null,
 ) {
 	return prisma.$transaction(async (tx) => {
-		await (tx as any).server.upsert({
+		await tx.server.upsert({
 			where: { id: guildId },
 			create: { id: guildId, name: guildName },
 			update: { name: guildName },
 		});
-		return (tx as any).warn.create({
+		return tx.warn.create({
 			data: { guildId, userId, moderatorId, reason, expiresAt },
 		});
 	});

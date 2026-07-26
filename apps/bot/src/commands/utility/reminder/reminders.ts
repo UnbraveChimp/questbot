@@ -1,8 +1,8 @@
 import { Command } from '@sapphire/framework';
 import { MessageFlags } from 'discord.js';
 import { getReminders } from '#lib/reminders.js';
-import { emojis } from '#utils/emoji.js';
 import { errorEmbed, infoEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class RemindersCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

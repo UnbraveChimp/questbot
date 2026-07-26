@@ -1,4 +1,4 @@
-import { Listener, type ChatInputCommandDeniedPayload, type UserError } from '@sapphire/framework';
+import { type ChatInputCommandDeniedPayload, Listener, type UserError } from '@sapphire/framework';
 import { MessageFlags } from 'discord.js';
 
 export class ChatInputCommandDeniedListener extends Listener {

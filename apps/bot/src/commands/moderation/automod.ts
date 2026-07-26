@@ -5,14 +5,14 @@ import {
 	ButtonStyle,
 	MessageFlags,
 	PermissionsBitField,
-	SlashCommandSubcommandBuilder,
-	SlashCommandStringOption,
+	type SlashCommandStringOption,
+	type SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import { createAutoMod, DuplicateAutoModError, getAutoMod, getAutoMods, removeAutoMod } from '#lib/automod.js';
 import { getQuestUnlimitedPurchaseComponents, LimitError } from '#lib/limits.js';
-import { emojis } from '#utils/emoji.js';
 import { awaitMessageComponentSafe } from '#utils/collectors.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class AutoModCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -20,7 +20,7 @@ export class AutoModCommand extends Command {
 	}
 
 	public override registerApplicationCommands(registry: Command.Registry) {
-		registry.registerChatInputCommand((builder: any) =>
+		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('automod')
 				.setDescription('Block words from being said!')

@@ -1,8 +1,8 @@
 import { Command } from '@sapphire/framework';
-import { MessageFlags, PermissionsBitField, PermissionFlagsBits, SlashCommandStringOption } from 'discord.js';
+import { MessageFlags, PermissionFlagsBits, PermissionsBitField, type SlashCommandStringOption } from 'discord.js';
 import ms, { type StringValue } from 'ms';
-import { emojis } from '#utils/emoji.js';
 import { errorEmbed, successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 const MAX_SLOWMODE_SECONDS = 21_600;
 

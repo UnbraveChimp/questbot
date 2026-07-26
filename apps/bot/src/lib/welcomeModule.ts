@@ -1,4 +1,4 @@
-import { DiscordAPIError, RESTJSONErrorCodes, type GuildMember } from 'discord.js';
+import { DiscordAPIError, type GuildMember, RESTJSONErrorCodes } from 'discord.js';
 import { getSettings } from '#lib/settings.js';
 import { emojis } from '#utils/emoji.js';
 

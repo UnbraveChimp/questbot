@@ -4,16 +4,16 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	EmbedBuilder,
-	GuildMember,
+	type GuildMember,
 	MessageFlags,
 	PermissionFlagsBits,
 	PermissionsBitField,
 } from 'discord.js';
 import ms, { type StringValue } from 'ms';
-import { createWarn } from '#lib/warns.js';
 import { logEmbed, truncate } from '#lib/logging.js';
+import { createWarn } from '#lib/warns.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { emojis } from '#utils/emoji.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class WarnCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -61,7 +61,7 @@ export class WarnCommand extends Command {
 		const duration = durationStr ? ms(durationStr) : null;
 		const expiresAt = duration ? new Date(Date.now() + duration) : null;
 
-		if (durationStr && (typeof duration !== 'number' || isNaN(duration))) {
+		if (durationStr && (typeof duration !== 'number' || Number.isNaN(duration))) {
 			await interaction.reply({
 				embeds: [errorEmbed(`${emojis.rightArrow2} Invalid duration format.`)],
 				flags: MessageFlags.Ephemeral,

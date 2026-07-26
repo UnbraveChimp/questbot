@@ -1,29 +1,34 @@
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
+import type { Attachment, ButtonInteraction, Message, TextChannel } from 'discord.js';
 import {
 	ActionRowBuilder,
+	AttachmentBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	MessageFlags,
 	ChannelType,
-	AttachmentBuilder,
+	LabelBuilder,
+	MessageFlags,
 	ModalBuilder,
 	TextInputBuilder,
 	TextInputStyle,
-	LabelBuilder,
 } from 'discord.js';
-import type { ButtonInteraction, TextChannel } from 'discord.js';
-import { emojis } from '#utils/emoji.js';
-import { getTicketId, removeTicket } from '#lib/tickets.js';
 import { getSettings } from '#lib/settings.js';
+import { getTicketId, removeTicket } from '#lib/tickets.js';
+import { emojis } from '#utils/emoji.js';
 
-async function generateTranscript(channel: TextChannel, ticket: any): Promise<string> {
-	const messages = new Map();
+async function generateTranscript(
+	channel: TextChannel,
+	ticket: NonNullable<Awaited<ReturnType<typeof getTicketId>>>,
+): Promise<string> {
+	const messages = new Map<string, Message<true>>();
 	let lastId: string | undefined;
 
 	while (true) {
 		const fetched = await channel.messages.fetch({ limit: 100, before: lastId });
 		if (fetched.size === 0) break;
-		fetched.forEach((msg) => messages.set(msg.id, msg));
+		fetched.forEach((msg) => {
+			messages.set(msg.id, msg);
+		});
 		lastId = fetched.last()?.id;
 	}
 
@@ -46,7 +51,7 @@ async function generateTranscript(channel: TextChannel, ticket: any): Promise<st
 
 		if (message.attachments.size > 0) {
 			transcript += `  Attachments: ${Array.from(message.attachments.values())
-				.map((a: any) => a.url)
+				.map((a: Attachment) => a.url)
 				.join(', ')}\n`;
 		}
 	}

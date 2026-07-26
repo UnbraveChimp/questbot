@@ -1,43 +1,35 @@
 {
-  "$schema": "https://v2-10-5.turborepo.dev/schema.json",
-  "envMode": "loose",
-  "globalDependencies": [".env", "pnpm-lock.yaml"],
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", "build/**"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true,
-      "dependsOn": ["^build"]
-    },
-    "start": {
-      "cache": false,
-      "persistent": true,
-      "dependsOn": ["^build"]
-    },
-    "lint": {
-      "outputs": [],
-      "cache": true
-    },
-    "format": {
-      "outputs": [],
-      "cache": false
-    },
-    "db:push": {
-      "cache": false
-    },
-    "db:generate": {
-      "outputs": ["src/generated/**"],
-      "cache": true
-    },
-    "test": {
-      "outputs": ["coverage/**"],
-      "cache": true
-    }
-  },
-  "remoteCache": {
-    "signature": false
-  }
+	"$schema": "https://v2-10-5.turborepo.dev/schema.json",
+	"envMode": "loose",
+	"globalDependencies": [".env", "pnpm-lock.yaml"],
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": ["dist/**", "build/**"]
+		},
+		"dev": {
+			"cache": false,
+			"persistent": true,
+			"dependsOn": ["^build"]
+		},
+		"start": {
+			"cache": false,
+			"persistent": true,
+			"dependsOn": ["^build"]
+		},
+		"db:push": {
+			"cache": false
+		},
+		"db:generate": {
+			"outputs": ["src/generated/**"],
+			"cache": true
+		},
+		"test": {
+			"outputs": ["coverage/**"],
+			"cache": true
+		}
+	},
+	"remoteCache": {
+		"signature": false
+	}
 }

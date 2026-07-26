@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import process from 'node:process';
-import { ShardingManager } from 'discord.js';
 import { dirname, join } from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { ShardingManager } from 'discord.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const shardFile = join(__dirname, 'index.js');

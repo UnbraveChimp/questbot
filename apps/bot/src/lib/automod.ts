@@ -1,6 +1,6 @@
 import { prisma } from '@questbot/database';
-import { hasQuestUnlimitedAccess, LIMITS_ENABLED, LimitError } from './limits.js';
 import type { EntitlementManager } from 'discord.js';
+import { hasQuestUnlimitedAccess, LIMITS_ENABLED, LimitError } from './limits.js';
 
 export class DuplicateAutoModError extends Error {
 	public constructor() {
@@ -15,7 +15,7 @@ export async function createAutoMod(
 	word: string,
 	entitlements?: EntitlementManager,
 ) {
-	if (!word || !word.trim()) {
+	if (!word?.trim()) {
 		throw new Error('Automod word cannot be empty.');
 	}
 

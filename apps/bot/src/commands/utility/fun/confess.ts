@@ -7,14 +7,16 @@ import {
 	LabelBuilder,
 	MessageFlags,
 	ModalBuilder,
+	type ModalSubmitInteraction,
+	type PublicThreadChannel,
+	TextChannel,
 	TextInputBuilder,
 	TextInputStyle,
-	TextChannel,
 } from 'discord.js';
+import { isConfessionBlacklisted, storeConfessionContext } from '#lib/confessions.js';
 import { getSettings } from '#lib/settings.js';
-import { storeConfessionContext, isConfessionBlacklisted } from '#lib/confessions.js';
-import { emojis } from '#utils/emoji.js';
 import { errorEmbed, successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class ConfessCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -82,11 +84,12 @@ export class ConfessCommand extends Command {
 
 		await interaction.showModal(modal);
 
-		let modalSubmit;
+		let modalSubmit: ModalSubmitInteraction;
 
 		try {
 			modalSubmit = await interaction.awaitModalSubmit({
-				filter: (m: any) => m.customId === 'create-confession-modal' && m.user.id === interaction.user.id,
+				filter: (m: ModalSubmitInteraction) =>
+					m.customId === 'create-confession-modal' && m.user.id === interaction.user.id,
 				time: 60_000,
 			});
 			await modalSubmit.deferReply({ flags: MessageFlags.Ephemeral });
@@ -109,7 +112,7 @@ export class ConfessCommand extends Command {
 
 		const message = await confessionChannel.send({ embeds: [embed] });
 
-		let thread;
+		let thread: PublicThreadChannel<false>;
 
 		try {
 			const threadName = confession.replace(/\\s+/g, ' ').slice(0, 10).toLowerCase() || 'confession';

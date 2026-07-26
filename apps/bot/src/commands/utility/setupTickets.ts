@@ -1,5 +1,4 @@
 import { Command } from '@sapphire/framework';
-import { emojis } from '#utils/emoji.js';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -9,6 +8,7 @@ import {
 	PermissionFlagsBits,
 } from 'discord.js';
 import { successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class SetupTicketsCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

@@ -5,16 +5,16 @@ import {
 	ButtonStyle,
 	MessageFlags,
 	PermissionFlagsBits,
-	SlashCommandRoleOption,
-	SlashCommandBooleanOption,
-	SlashCommandStringOption,
-	SlashCommandSubcommandBuilder,
+	type SlashCommandBooleanOption,
+	type SlashCommandRoleOption,
+	type SlashCommandStringOption,
+	type SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import { createAutoRole, getAutoRole, getAutoRoles, removeAutoRole } from '#lib/autorole.js';
 import { getQuestUnlimitedPurchaseComponents, LimitError } from '#lib/limits.js';
-import { emojis } from '#utils/emoji.js';
 import { awaitMessageComponentSafe } from '#utils/collectors.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class AutoRoleCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

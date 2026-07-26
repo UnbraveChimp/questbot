@@ -1,10 +1,10 @@
 import { Listener } from '@sapphire/framework';
-import { ActivityType, Events, type Client } from 'discord.js';
-import { enforceMute, getActiveMutes } from '#lib/mutes.js';
-import { heartbeat } from '#utils/heartbeat.js';
+import { ActivityType, type Client, Events } from 'discord.js';
 import { purgeExpiredBans } from '#lib/bans.js';
+import { enforceMute, getActiveMutes } from '#lib/mutes.js';
 import { reminderScheduler } from '#lib/reminderEvent.js';
 import { purgeExpiredWarns } from '#lib/warns.js';
+import { heartbeat } from '#utils/heartbeat.js';
 
 export class ReadyListener extends Listener<typeof Events.ClientReady> {
 	public constructor(context: Listener.LoaderContext, options: Listener.Options) {

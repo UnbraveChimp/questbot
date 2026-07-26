@@ -7,17 +7,17 @@ import {
 	ChannelType,
 	InteractionContextType,
 	type Message,
-	MessageFlags,
 	type MessageComponentInteraction,
+	MessageFlags,
 	PermissionFlagsBits,
 	RoleSelectMenuBuilder,
 } from 'discord.js';
 import { getSettings, updateSettings } from '#lib/settings.js';
-import { emojis } from '#utils/emoji.js';
 import { awaitMessageComponentSafe } from '#utils/collectors.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
-const staleInteractionErrorCodes = new Set([10_015, 50_027, 10062]);
+const STALE_INTERACTION_ERROR_CODES = new Set([10_015, 50_027, 10062]);
 
 function isStaleInteractionError(error: unknown): error is { code: number } {
 	return (
@@ -25,7 +25,7 @@ function isStaleInteractionError(error: unknown): error is { code: number } {
 		error !== null &&
 		'code' in error &&
 		typeof error.code === 'number' &&
-		staleInteractionErrorCodes.has(error.code)
+		STALE_INTERACTION_ERROR_CODES.has(error.code)
 	);
 }
 
@@ -47,7 +47,7 @@ function nextSkipRow() {
 
 async function runCollector(
 	message: Message,
-	filter: (i: any) => boolean,
+	filter: (i: MessageComponentInteraction) => boolean,
 	timeout: number,
 	handler: (i: MessageComponentInteraction, stop: () => void) => Promise<void>,
 ): Promise<boolean> {

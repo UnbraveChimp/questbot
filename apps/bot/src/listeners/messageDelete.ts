@@ -1,5 +1,5 @@
 import { Listener } from '@sapphire/framework';
-import { Events, EmbedBuilder, type Message, type PartialMessage } from 'discord.js';
+import { EmbedBuilder, Events, type Message, type PartialMessage } from 'discord.js';
 import { removeConfessionContext } from '#lib/confessions.js';
 import { isLoggingChannel, logEmbed, truncate } from '#lib/logging.js';
 

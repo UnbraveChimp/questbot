@@ -1,6 +1,6 @@
 import { Command } from '@sapphire/framework';
-import { emojis } from '#utils/emoji.js';
 import { EmbedBuilder, MessageFlags } from 'discord.js';
+import { emojis } from '#utils/emoji.js';
 
 export class HelpCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -19,7 +19,9 @@ export class HelpCommand extends Command {
 		const commandList = Array.from(commands.values())
 			.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
 			.map((cmd) => {
+				// biome-ignore lint/complexity/useLiteralKeys: x
 				const description = cmd.applicationCommandRegistry['apiCalls'][0]?.builtData.description ?? cmd.description;
+				// biome-ignore lint/complexity/useLiteralKeys: x
 				const commandName = cmd.applicationCommandRegistry['apiCalls'][0]?.builtData.name ?? cmd.name;
 
 				return `${emojis.rightArrow1} **/${commandName}** - ${description}`;

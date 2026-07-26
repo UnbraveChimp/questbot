@@ -1,7 +1,7 @@
-import { lookup } from 'node:dns/promises';
 import type { LookupAddress, LookupOptions } from 'node:dns';
+import { lookup } from 'node:dns/promises';
+import type http from 'node:http';
 import https from 'node:https';
-import http from 'node:http';
 import { Readable } from 'node:stream';
 import ipaddr from 'ipaddr.js';
 

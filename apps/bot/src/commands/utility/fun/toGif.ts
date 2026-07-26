@@ -1,9 +1,9 @@
 import { Command } from '@sapphire/framework';
-import { AttachmentBuilder, SlashCommandStringOption } from 'discord.js';
+import { AttachmentBuilder, type SlashCommandStringOption } from 'discord.js';
 import sharp from 'sharp';
-import { emojis } from '#utils/emoji.js';
-import { safeFetch, readLimited, SafeFetchError } from '#lib/safeFetch.js';
+import { readLimited, SafeFetchError, safeFetch } from '#lib/safeFetch.js';
 import { errorEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 // todo: add video support (mp4, webm, mov)
 
@@ -32,7 +32,7 @@ export class ToGifCommand extends Command {
 
 		await interaction.deferReply();
 
-		let response;
+		let response: Response;
 		try {
 			response = await safeFetch(url);
 		} catch (err) {

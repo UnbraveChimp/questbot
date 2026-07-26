@@ -1,6 +1,6 @@
 import { prisma } from '@questbot/database';
-import { hasQuestUnlimitedAccess, LIMITS_ENABLED, LimitError } from './limits.js';
 import type { EntitlementManager } from 'discord.js';
+import { hasQuestUnlimitedAccess, LIMITS_ENABLED, LimitError } from './limits.js';
 
 export async function createAutoRole(
 	guildId: string,

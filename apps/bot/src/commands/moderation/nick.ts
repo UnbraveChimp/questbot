@@ -1,14 +1,14 @@
 import { Command } from '@sapphire/framework';
 import {
-	GuildMember,
+	type GuildMember,
 	MessageFlags,
-	PermissionsBitField,
-	SlashCommandStringOption,
-	SlashCommandUserOption,
 	PermissionFlagsBits,
+	PermissionsBitField,
+	type SlashCommandStringOption,
+	type SlashCommandUserOption,
 } from 'discord.js';
-import { emojis } from '#utils/emoji.js';
 import { errorEmbed, successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class NickCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

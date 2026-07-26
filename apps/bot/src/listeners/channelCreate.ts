@@ -1,5 +1,5 @@
 import { Listener } from '@sapphire/framework';
-import { AuditLogEvent, EmbedBuilder, Events, type Channel } from 'discord.js';
+import { AuditLogEvent, type Channel, EmbedBuilder, Events } from 'discord.js';
 import { getRecentAuditLogEntry, isLoggingChannel, logEmbed } from '#lib/logging.js';
 
 export class ChannelCreateListener extends Listener<typeof Events.ChannelCreate> {

@@ -1,4 +1,4 @@
-import { AuditLogEvent, EmbedBuilder, type Guild } from 'discord.js';
+import type { AuditLogEvent, EmbedBuilder, Guild } from 'discord.js';
 import { getSettings } from '#lib/settings.js';
 
 export async function logEmbed(guild: Guild, embed: EmbedBuilder) {
@@ -7,7 +7,7 @@ export async function logEmbed(guild: Guild, embed: EmbedBuilder) {
 		return null;
 	});
 
-	if (!settings || !settings.loggingEnabled || !settings.loggingChannelId) return;
+	if (!settings?.loggingEnabled || !settings.loggingChannelId) return;
 
 	const channel = await guild.channels.fetch(settings.loggingChannelId).catch(() => null);
 	if (!channel?.isTextBased() || !channel.isSendable()) return;

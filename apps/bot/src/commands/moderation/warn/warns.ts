@@ -1,14 +1,14 @@
 import { Command } from '@sapphire/framework';
 import {
-	GuildMember,
+	type GuildMember,
 	MessageFlags,
 	PermissionFlagsBits,
 	PermissionsBitField,
-	SlashCommandUserOption,
+	type SlashCommandUserOption,
 } from 'discord.js';
 import { getWarns } from '#lib/warns.js';
-import { emojis } from '#utils/emoji.js';
 import { errorEmbed, infoEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class WarnsCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

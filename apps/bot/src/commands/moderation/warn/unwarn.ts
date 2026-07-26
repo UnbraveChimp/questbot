@@ -3,15 +3,15 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	GuildMember,
+	type GuildMember,
 	MessageFlags,
-	SlashCommandStringOption,
 	PermissionFlagsBits,
 	PermissionsBitField,
+	type SlashCommandStringOption,
 } from 'discord.js';
 import { getWarn, removeWarn } from '#lib/warns.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { emojis } from '#utils/emoji.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class UnwarnCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

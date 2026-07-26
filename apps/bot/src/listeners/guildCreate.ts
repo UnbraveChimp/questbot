@@ -1,5 +1,5 @@
 import { Listener } from '@sapphire/framework';
-import { AuditLogEvent, EmbedBuilder, Events, PermissionFlagsBits, type Guild } from 'discord.js';
+import { AuditLogEvent, EmbedBuilder, Events, type Guild, PermissionFlagsBits } from 'discord.js';
 
 export class GuildCreateListener extends Listener<typeof Events.GuildCreate> {
 	public constructor(context: Listener.LoaderContext, options: Listener.Options) {

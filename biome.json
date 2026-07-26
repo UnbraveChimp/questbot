@@ -1,0 +1,83 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.5/schema.json",
+	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+	"files": { "ignoreUnknown": false },
+	"formatter": {
+		"enabled": true,
+		"formatWithErrors": false,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineEnding": "lf",
+		"lineWidth": 120,
+		"attributePosition": "auto",
+		"bracketSameLine": false,
+		"bracketSpacing": true,
+		"expand": "auto",
+		"useEditorconfig": true,
+		"includes": ["**", "!**/dist"]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"style": {
+				"noNonNullAssertion": "off",
+				"useNamingConvention": {
+					"level": "error",
+					"options": {
+						"conventions": [
+							{
+								"selector": { "kind": "const", "scope": "global" },
+								"match": "(client|manager|shardFile|shardCountEnv|emojis|ownerDmCooldown|prisma|globalForPrisma|auth|authClient|links|[A-Z][a-zA-Z0-9]*(?:_[A-Z0-9]+)*)"
+							},
+							{
+								"selector": { "kind": "any" },
+								"match": ".*"
+							}
+						]
+					}
+				}
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"jsxQuoteStyle": "double",
+			"quoteProperties": "asNeeded",
+			"trailingCommas": "all",
+			"semicolons": "always",
+			"arrowParentheses": "always",
+			"bracketSameLine": false,
+			"quoteStyle": "single",
+			"attributePosition": "auto",
+			"bracketSpacing": true
+		}
+	},
+	"html": {
+		"formatter": {
+			"indentScriptAndStyle": false,
+			"selfCloseVoidElements": "always"
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"assist": {
+		"enabled": true,
+		"actions": { "source": { "organizeImports": "on" } }
+	},
+	"overrides": [
+		{
+			"includes": ["apps/bot/src/sharder.ts"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useNamingConvention": "off"
+					}
+				}
+			}
+		}
+	]
+}

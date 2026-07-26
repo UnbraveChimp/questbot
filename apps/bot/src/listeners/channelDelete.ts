@@ -1,5 +1,5 @@
 import { Listener } from '@sapphire/framework';
-import { AuditLogEvent, EmbedBuilder, Events, type APIEmbedField, type Channel } from 'discord.js';
+import { type APIEmbedField, AuditLogEvent, type Channel, EmbedBuilder, Events } from 'discord.js';
 import { removeConfessionContextsByChannel } from '#lib/confessions.js';
 import { getRecentAuditLogEntry, isLoggingChannel, logEmbed } from '#lib/logging.js';
 

@@ -1,7 +1,7 @@
-import { Command, BucketScope } from '@sapphire/framework';
-import { emojis } from '#utils/emoji.js';
-import { SlashCommandStringOption, MessageFlags } from 'discord.js';
+import { BucketScope, Command } from '@sapphire/framework';
+import { MessageFlags, type SlashCommandStringOption } from 'discord.js';
 import { errorEmbed, successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class SuggestCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

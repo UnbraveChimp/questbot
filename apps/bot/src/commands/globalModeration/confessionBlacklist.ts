@@ -1,13 +1,13 @@
 import { Command } from '@sapphire/framework';
 import {
 	MessageFlags,
-	SlashCommandUserOption,
-	SlashCommandStringOption,
-	SlashCommandSubcommandBuilder,
+	type SlashCommandStringOption,
+	type SlashCommandSubcommandBuilder,
+	type SlashCommandUserOption,
 } from 'discord.js';
-import { addConfessionBlacklist, removeConfessionBlacklist, isConfessionBlacklisted } from '#lib/confessions.js';
+import { addConfessionBlacklist, isConfessionBlacklisted, removeConfessionBlacklist } from '#lib/confessions.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { emojis } from '#utils/emoji.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class ConfessionBlacklistCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

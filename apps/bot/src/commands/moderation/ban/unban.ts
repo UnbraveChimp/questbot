@@ -3,15 +3,15 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	GuildMember,
+	type GuildMember,
 	MessageFlags,
-	PermissionsBitField,
 	PermissionFlagsBits,
-	SlashCommandStringOption,
+	PermissionsBitField,
+	type SlashCommandStringOption,
 } from 'discord.js';
 import { getBan, removeBan } from '#lib/bans.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { emojis } from '#utils/emoji.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class UnbanCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

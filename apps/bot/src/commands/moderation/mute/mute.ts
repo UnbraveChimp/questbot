@@ -3,17 +3,17 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	GuildMember,
+	type GuildMember,
 	MessageFlags,
-	PermissionsBitField,
 	PermissionFlagsBits,
-	SlashCommandUserOption,
-	SlashCommandStringOption,
+	PermissionsBitField,
+	type SlashCommandStringOption,
+	type SlashCommandUserOption,
 } from 'discord.js';
 import ms, { type StringValue } from 'ms';
 import { createMute, enforceMute } from '#lib/mutes.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { emojis } from '#utils/emoji.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class MuteCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -74,7 +74,7 @@ export class MuteCommand extends Command {
 			return;
 		}
 
-		if (typeof duration !== 'number' || isNaN(duration) || duration <= 0) {
+		if (typeof duration !== 'number' || Number.isNaN(duration) || duration <= 0) {
 			await interaction.reply({
 				embeds: [errorEmbed(`${emojis.rightArrow2} Invalid duration format.`)],
 				flags: MessageFlags.Ephemeral,

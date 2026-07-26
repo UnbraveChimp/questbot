@@ -1,15 +1,13 @@
 import { Listener } from '@sapphire/framework';
-import { EmbedBuilder, type Message } from 'discord.js';
+import { EmbedBuilder, Events, type Message, type PartialMessage } from 'discord.js';
 import { isLoggingChannel, logEmbed, truncate } from '#lib/logging.js';
 
 export class MessageUpdateListener extends Listener {
 	public constructor(context: Listener.LoaderContext, options: Listener.Options) {
-		super(context, { ...options, event: 'messageUpdate' as any });
+		super(context, { ...options, event: Events.MessageUpdate });
 	}
 
-	public async run(oldMessage: unknown, newMessage: unknown) {
-		const oldMsg = oldMessage as Message | null;
-		const newMsg = newMessage as Message;
+	public async run(oldMsg: Message | PartialMessage, newMsg: Message) {
 		const guild = newMsg.guild ?? oldMsg?.guild;
 		if (!guild) return;
 		if (await isLoggingChannel(guild, newMsg.channel?.id ?? oldMsg?.channel?.id)) return;

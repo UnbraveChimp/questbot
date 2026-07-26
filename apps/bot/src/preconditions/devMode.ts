@@ -1,13 +1,13 @@
 import { Precondition } from '@sapphire/framework';
-import type { CommandInteraction, Message, ContextMenuCommandInteraction } from 'discord.js';
+import type { CommandInteraction, ContextMenuCommandInteraction, Message } from 'discord.js';
 
 const DEV_IDS = new Set(
-	(process.env['DEVIDS'] ?? '')
+	(process.env.DEVIDS ?? '')
 		.split(',')
 		.map((id) => id.trim())
 		.filter(Boolean),
 );
-const DEV_MODE = process.env['DEV'] === 'true';
+const DEV_MODE = process.env.DEV === 'true';
 
 export class devModePrecondition extends Precondition {
 	public override chatInputRun(interaction: CommandInteraction) {

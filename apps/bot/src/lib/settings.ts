@@ -1,4 +1,4 @@
-import { Prisma, prisma } from '@questbot/database';
+import { type Prisma, prisma } from '@questbot/database';
 
 export type ServerSettings = {
 	welcomePeople: boolean;

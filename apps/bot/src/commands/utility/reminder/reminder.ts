@@ -1,10 +1,15 @@
 import { Command } from '@sapphire/framework';
-import { MessageFlags, SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandStringOption } from 'discord.js';
+import {
+	MessageFlags,
+	type SlashCommandBuilder,
+	type SlashCommandStringOption,
+	type SlashCommandSubcommandBuilder,
+} from 'discord.js';
 import ms, { type StringValue } from 'ms';
-import { createReminder, getReminder, removeReminder } from '#lib/reminders.js';
 import { LimitError } from '#lib/limits.js';
+import { createReminder, getReminder, removeReminder } from '#lib/reminders.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { emojis } from '#utils/emoji.js';
-import { errorEmbed, successEmbed, infoEmbed } from '#utils/embeds.js';
 
 export class ReminderCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -46,7 +51,7 @@ export class ReminderCommand extends Command {
 			const message = interaction.options.getString('message', true);
 
 			const duration = ms(durationStr as StringValue);
-			if (typeof duration !== 'number' || isNaN(duration) || duration <= 0) {
+			if (typeof duration !== 'number' || Number.isNaN(duration) || duration <= 0) {
 				await interaction.reply({
 					embeds: [errorEmbed(`${emojis.rightArrow2} Invalid duration.`)],
 					flags: MessageFlags.Ephemeral,

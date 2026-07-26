@@ -1,9 +1,9 @@
 import { cmuDictionaryLookup, syllableCount } from 'syllable-count-english';
 
 // all 15 ARPAbet vowel phonemes, each one is a syllable basically
-const vowels = new Set(['AO', 'AA', 'IY', 'UW', 'EH', 'IH', 'UH', 'AH', 'AE', 'EY', 'AY', 'OW', 'AW', 'OY', 'ER']);
+const VOWELS = new Set(['AO', 'AA', 'IY', 'UW', 'EH', 'IH', 'UH', 'AH', 'AE', 'EY', 'AY', 'OW', 'AW', 'OY', 'ER']);
 
-const pattern = /\w+(?:[\w'\-.][\w.]+)?/g;
+const PATTERN = /\w+(?:[\w'\-.][\w.]+)?/g;
 
 function analyze(arpabet: string): { count: number; collapsible: boolean } {
 	const phonemes = arpabet.split(' ');
@@ -11,11 +11,11 @@ function analyze(arpabet: string): { count: number; collapsible: boolean } {
 	let collapsible = false;
 
 	for (let i = 0; i < phonemes.length; i++) {
-		if (vowels.has(phonemes[i].slice(0, 2))) count++; // count syllables by counting vowel phonemes (and slice the stress marker if it exists)
+		if (VOWELS.has(phonemes[i].slice(0, 2))) count++; // count syllables by counting vowel phonemes (and slice the stress marker if it exists)
 		const next = phonemes[i + 1];
 		// when ee is followed by another vowel can be pronounced as 1 syllable this is why we mark it as collapsible :D
 		// however it can only be collapsed if the next vowel is unstressed (ARPAbet vowel ends with 0)
-		if (phonemes[i] === 'IY0' && next?.endsWith('0') && vowels.has(next.slice(0, 2))) collapsible = true;
+		if (phonemes[i] === 'IY0' && next?.endsWith('0') && VOWELS.has(next.slice(0, 2))) collapsible = true;
 	}
 
 	return { count, collapsible };
@@ -46,7 +46,7 @@ function syllables(word: string): Set<number> {
 }
 
 function syllableCounts(line: string, target: number): Set<number> {
-	const words = line.match(pattern) ?? []; // match words including contractions and hyphenated words
+	const words = line.match(PATTERN) ?? []; // match words including contractions and hyphenated words
 
 	let totals = new Set([0]);
 	// loop through each word in this line and get the total syllable count

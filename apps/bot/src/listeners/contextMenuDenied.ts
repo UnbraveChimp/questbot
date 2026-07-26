@@ -1,4 +1,4 @@
-import { Listener, type ContextMenuCommandDeniedPayload, type UserError } from '@sapphire/framework';
+import { type ContextMenuCommandDeniedPayload, Listener, type UserError } from '@sapphire/framework';
 import { MessageFlags } from 'discord.js';
 
 export class ContextMenuCommandDeniedListener extends Listener {

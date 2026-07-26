@@ -2,16 +2,19 @@ import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
+	type ButtonInteraction,
 	ButtonStyle,
 	ChannelType,
 	LabelBuilder,
 	MessageFlags,
 	ModalBuilder,
+	type OverwriteResolvable,
 	PermissionFlagsBits,
+	TextInputBuilder,
+	TextInputStyle,
 } from 'discord.js';
-import { TextInputBuilder, TextInputStyle, type ButtonInteraction } from 'discord.js';
 import { getSettings, updateSettings } from '#lib/settings.js';
-import { TicketLimitError, createTicket, removeTicket, setTicketChannelId } from '#lib/tickets.js';
+import { createTicket, removeTicket, setTicketChannelId, TicketLimitError } from '#lib/tickets.js';
 import { emojis } from '#utils/emoji.js';
 
 export class ButtonHandler extends InteractionHandler {
@@ -82,7 +85,7 @@ export class ButtonHandler extends InteractionHandler {
 			}
 		}
 
-		let ticket;
+		let ticket: Awaited<ReturnType<typeof createTicket>>;
 		try {
 			ticket = await createTicket(interaction.guild.id, interaction.guild.name, interaction.user.id, reason);
 		} catch (error) {
@@ -96,7 +99,7 @@ export class ButtonHandler extends InteractionHandler {
 			throw error;
 		}
 
-		const permissionOverwrites = [
+		const permissionOverwrites: OverwriteResolvable[] = [
 			{
 				id: interaction.guild.id,
 				deny: [PermissionFlagsBits.ViewChannel],
@@ -118,7 +121,7 @@ export class ButtonHandler extends InteractionHandler {
 					PermissionFlagsBits.ManageChannels,
 				],
 			},
-		] as any[];
+		];
 
 		const staffRoleId = settings.staffRole;
 		const staffRoleExists = typeof staffRoleId === 'string' && interaction.guild.roles.cache.has(staffRoleId);

@@ -13,8 +13,8 @@
 	"scripts": {
 		"build": "dotenv -e .env -- turbo run build",
 		"dev": "dotenv -e .env -- turbo run dev",
-		"lint": "dotenv -e .env -- turbo run lint",
-		"format": "dotenv -e .env -- turbo run format",
+		"lint": "biome check .",
+		"format": "biome check --write .",
 		"start": "pnpm --filter @duckorganization/bot start",
 		"db:push": "dotenv -e .env -- turbo run db:push",
 		"db:generate": "dotenv -e .env -- turbo run db:generate",
@@ -28,6 +28,7 @@
 		"node": ">=22.12.0"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^2.5.5",
 		"dotenv-cli": "^11.0.0",
 		"turbo": "^2.10.5"
 	}

@@ -1,8 +1,8 @@
 import { Command } from '@sapphire/framework';
-import { emojis } from '#utils/emoji.js';
 import { EmbedBuilder, MessageFlags, PermissionsBitField } from 'discord.js';
-import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { logEmbed } from '#lib/logging.js';
+import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class PurgeCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

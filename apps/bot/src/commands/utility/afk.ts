@@ -1,9 +1,9 @@
 import { Command } from '@sapphire/framework';
-import { MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from 'discord.js';
+import { MessageFlags, type SlashCommandBuilder, type SlashCommandStringOption } from 'discord.js';
 import { setAfk } from '#lib/afk.js';
 import { containsBlockedWord } from '#lib/automod.js';
-import { emojis } from '#utils/emoji.js';
 import { errorEmbed, successEmbed } from '#utils/embeds.js';
+import { emojis } from '#utils/emoji.js';
 
 export class AfkCommand extends Command {
 	public constructor(context: Command.LoaderContext, options: Command.Options) {

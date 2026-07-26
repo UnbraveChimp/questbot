@@ -1,5 +1,5 @@
 import { prisma } from '@questbot/database';
-import { Guild } from 'discord.js';
+import type { Guild } from 'discord.js';
 
 export async function createMute(
 	guildId: string,
@@ -50,7 +50,7 @@ export async function enforceMute(guild: Guild, userId: string): Promise<boolean
 	}
 
 	const member = await guild.members.fetch(userId).catch(() => null);
-	if (!member || !member.moderatable) return false;
+	if (!member?.moderatable) return false;
 
 	const remaining = mute.expiresAt ? Math.min(mute.expiresAt.getTime() - Date.now(), 2419200000) : 2419200000;
 

@@ -2,16 +2,17 @@ import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
+	type ButtonInteraction,
 	ButtonStyle,
 	EmbedBuilder,
 	LabelBuilder,
 	MessageFlags,
 	ModalBuilder,
+	type ModalSubmitInteraction,
 	TextInputBuilder,
 	TextInputStyle,
-	type ButtonInteraction,
 } from 'discord.js';
-import { getModeratorIds, getConfessionContext, removeConfessionContext } from '#lib/confessions.js';
+import { getConfessionContext, getModeratorIds, removeConfessionContext } from '#lib/confessions.js';
 import { emojis } from '#utils/emoji.js';
 
 interface ParsedConfessionButton {
@@ -140,7 +141,7 @@ export class ConfessionButtonHandler extends InteractionHandler {
 
 		await interaction.showModal(modal);
 
-		let modalSubmit;
+		let modalSubmit: ModalSubmitInteraction;
 
 		try {
 			modalSubmit = await interaction.awaitModalSubmit({
@@ -316,8 +317,8 @@ export class ConfessionButtonHandler extends InteractionHandler {
 		try {
 			if (context.threadId) {
 				const thread = await interaction.client.channels.fetch(context.threadId).catch(() => null);
-				if (thread && typeof (thread as any).setName === 'function') {
-					await (thread as any).setName('confession-deleted').catch(() => null);
+				if (thread?.isThread()) {
+					await thread.setName('confession-deleted').catch(() => null);
 				}
 			}
 		} catch (error) {

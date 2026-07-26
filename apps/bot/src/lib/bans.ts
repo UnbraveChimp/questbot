@@ -1,5 +1,5 @@
 import { prisma } from '@questbot/database';
-import { Guild, PermissionFlagsBits, Client } from 'discord.js';
+import { type Client, type Guild, PermissionFlagsBits } from 'discord.js';
 
 export async function createBan(
 	guildId: string,
