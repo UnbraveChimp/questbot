@@ -5,6 +5,8 @@ import { emojis } from '#utils/emoji.js';
 import { safeFetch, readLimited, SafeFetchError } from '#lib/safeFetch.js';
 import { errorEmbed } from '#utils/embeds.js';
 
+// todo: add video support (mp4, webm, mov)
+
 const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 const MAX_SIZE = 8 * 1024 * 1024;
 const MAX_DIMENSION = 800;

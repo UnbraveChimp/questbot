@@ -18,9 +18,10 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
 	public async run(client: Client<true>) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 		const status = process.env.STATUS ?? '';
+		const shardStatus = process.env.SHARD_STATUS === 'true';
 
 		client.user.setActivity({
-			name: `${status} | Shard ${client.shard?.ids?.[0] ?? 0}`,
+			name: shardStatus ? `${status} | Shard ${client.shard?.ids?.[0] ?? 0}` : status,
 			type: ActivityType.Custom,
 		});
 
