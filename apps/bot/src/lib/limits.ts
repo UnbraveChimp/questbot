@@ -22,7 +22,6 @@ export async function hasQuestUnlimitedAccess(entitlements: EntitlementManager, 
 			excludeEnded: true,
 			excludeDeleted: true,
 		});
-
 		return guildEntitlements.size > 0;
 	} catch (err) {
 		console.error(err);
@@ -36,7 +35,7 @@ export function getQuestUnlimitedUrl(applicationId: string) {
 
 export function getQuestUnlimitedPurchaseComponents(applicationId: string) {
 	const purchaseButton = new ButtonBuilder()
-		.setLabel('Upgrade to Quest Unlimited')
+		.setLabel('Upgrade')
 		.setStyle(ButtonStyle.Link)
 		.setURL(getQuestUnlimitedUrl(applicationId));
 
