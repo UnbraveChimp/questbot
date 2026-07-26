@@ -24,7 +24,8 @@ export async function hasQuestUnlimitedAccess(entitlements: EntitlementManager, 
 		});
 
 		return guildEntitlements.size > 0;
-	} catch {
+	} catch (err) {
+		console.error(err);
 		return false;
 	}
 }
