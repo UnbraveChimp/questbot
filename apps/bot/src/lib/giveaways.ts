@@ -1,7 +1,8 @@
-import { type Prisma, prisma } from '@questbot/database';
+import { Prisma, prisma } from '@questbot/database';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, type Client, EmbedBuilder } from 'discord.js';
 import { Colors } from '#utils/embeds.js';
 import { getChannel } from '#utils/getChannel.js';
+import { type ShardInfo, shardOwns } from '#utils/sharding.js';
 
 type GiveawayView = Prisma.GiveawayModel;
 
@@ -185,10 +186,15 @@ export async function leaveGiveaway(giveawayId: string, userId: string) {
 	});
 }
 
-export async function getDueGiveaways() {
-	return prisma.giveaway.findMany({
-		where: { ended: false, endsAt: { lte: new Date() } },
-	});
+export async function getDueGiveaways(shard: ShardInfo) {
+	return prisma.$queryRaw<GiveawayView[]>`
+		SELECT * FROM "giveaways"
+		WHERE "ended" = false
+			AND "endsAt" <= ${new Date()}
+			AND ${shardOwns(Prisma.sql`"guildId"::bigint`, shard)}
+		ORDER BY "endsAt" ASC
+		LIMIT 100
+	`;
 }
 
 export async function deleteGiveaway(giveawayId: string) {

@@ -1,4 +1,5 @@
-import { prisma } from '@questbot/database';
+import { Prisma, prisma } from '@questbot/database';
+import { type ShardInfo, shardOwns } from '#utils/sharding.js';
 import { LIMITS_ENABLED, LimitError } from './limits.js';
 
 export async function createReminder(
@@ -51,8 +52,12 @@ export async function getReminder(reminderId: string) {
 	return prisma.reminder.findUnique({ where: { id: reminderId } });
 }
 
-export async function getDueReminders() {
-	return prisma.reminder.findMany({
-		where: { remindAt: { lte: new Date() } },
-	});
+export async function getDueReminders(shard: ShardInfo) {
+	return prisma.$queryRaw<Prisma.ReminderModel[]>`
+		SELECT * FROM "Reminder"
+		WHERE "remindAt" <= ${new Date()}
+			AND ${shardOwns(Prisma.sql`COALESCE("guildId", "userId")::bigint`, shard)}
+		ORDER BY "remindAt" ASC
+		LIMIT 100
+	`;
 }

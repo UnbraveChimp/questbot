@@ -8,8 +8,6 @@ export function reminderScheduler(client: Client) {
 	startShardedPoller({
 		client,
 		getDue: getDueReminders,
-		// each shard handles its reminders for its own guild
-		getOwnerKey: (reminder) => reminder.guildId ?? reminder.userId,
 		handle: (reminder) => handleReminder(client, reminder),
 	});
 }

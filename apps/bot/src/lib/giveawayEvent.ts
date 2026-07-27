@@ -7,7 +7,6 @@ export function giveawayScheduler(client: Client) {
 	startShardedPoller({
 		client,
 		getDue: getDueGiveaways,
-		getOwnerKey: (giveaway) => giveaway.guildId,
 		handle: (giveaway) => endGiveaway(client, giveaway.id).then(() => undefined),
 	});
 }

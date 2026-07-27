@@ -1,15 +1,32 @@
+import { Prisma } from '@questbot/database';
 import type { Client } from 'discord.js';
-
-export function ownerShardId(snowflake: string, totalShards: number): number {
-	return Number((BigInt(snowflake) >> 22n) % BigInt(totalShards));
-}
 
 const INTERVAL = 30_000; // this can be overridden by passing intervalMs into the function
 
+export interface ShardInfo {
+	shardId: number;
+	totalShards: number;
+}
+
+export function getShardInfo(client: Client): ShardInfo {
+	return {
+		shardId: client.shard?.ids[0] ?? 0,
+		totalShards: client.shard?.count ?? 1,
+	};
+}
+
+// for the bot wide cleanup that only needs to happen once
+export function isPrimaryShard(client: Client): boolean {
+	return getShardInfo(client).shardId === 0;
+}
+
+export function shardOwns(snowflake: Prisma.Sql, { shardId, totalShards }: ShardInfo): Prisma.Sql {
+	return Prisma.sql`(${snowflake} >> 22) % ${totalShards}::bigint = ${shardId}::bigint`;
+}
+
 interface ShardedPollerOptions<T> {
 	client: Client;
-	getDue: () => Promise<T[]>;
-	getOwnerKey: (item: T) => string;
+	getDue: (shard: ShardInfo) => Promise<T[]>;
 	handle: (item: T) => Promise<void>;
 	intervalMs?: number;
 }
@@ -18,19 +35,14 @@ interface ShardedPollerOptions<T> {
 export function startShardedPoller<T>({
 	client,
 	getDue,
-	getOwnerKey,
 	handle,
 	intervalMs = INTERVAL,
 }: ShardedPollerOptions<T>): void {
 	const tick = async () => {
 		try {
-			const due = await getDue();
-			const totalShards = client.shard?.count ?? 1;
-			const shardId = client.shard?.ids[0] ?? 0;
+			const due = await getDue(getShardInfo(client));
 
-			const owned = due.filter((item) => ownerShardId(getOwnerKey(item), totalShards) === shardId);
-
-			await Promise.allSettled(owned.map((item) => handle(item).catch((err) => console.error(err))));
+			await Promise.allSettled(due.map((item) => handle(item).catch((err) => console.error(err))));
 		} catch (err) {
 			console.error(err);
 		}
