@@ -1,27 +1,12 @@
 import { prisma } from '@questbot/database';
-import type { EntitlementManager } from 'discord.js';
-import { hasQuestUnlimitedAccess, LIMITS_ENABLED, LimitError } from './limits.js';
+import { LIMITS_ENABLED, LimitError } from './limits.js';
 
-export async function createAutoRole(
-	guildId: string,
-	guildName: string,
-	roleId: string,
-	botRole?: boolean,
-	entitlements?: EntitlementManager,
-) {
-	const hasUnlimitedAccess = entitlements ? await hasQuestUnlimitedAccess(entitlements, guildId) : false;
-
+export async function createAutoRole(guildId: string, guildName: string, roleId: string, botRole?: boolean) {
 	if (LIMITS_ENABLED) {
 		const autoRoleCount = await prisma.autoRole.count({ where: { guildId } });
 
-		if (autoRoleCount >= 15 && !hasUnlimitedAccess) {
-			throw new LimitError('A guild can only have up to 15 auto roles.', true);
-		}
-
-		if (autoRoleCount >= 250 && hasUnlimitedAccess) {
-			throw new LimitError(
-				'A guild with unlimited access can only have up to 250 auto roles. This is to combat abuse.',
-			);
+		if (autoRoleCount >= 15) {
+			throw new LimitError('A guild can only have up to 15 auto roles.');
 		}
 	}
 
