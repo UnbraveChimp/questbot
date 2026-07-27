@@ -11,7 +11,7 @@ import {
 	type SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import { createAutoRole, getAutoRole, getAutoRoles, removeAutoRole } from '#lib/autorole.js';
-import { getQuestUnlimitedPurchaseComponents, LimitError } from '#lib/limits.js';
+import { LimitError } from '#lib/limits.js';
 import { awaitMessageComponentSafe } from '#utils/collectors.js';
 import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
 import { emojis } from '#utils/emoji.js';
@@ -116,30 +116,13 @@ export class AutoRoleCommand extends Command {
 			}
 
 			try {
-				await createAutoRole(
-					interaction.guildId,
-					interaction.guild.name,
-					role.id,
-					botRole,
-					interaction.client.application.entitlements,
-				);
+				await createAutoRole(interaction.guildId, interaction.guild.name, role.id, botRole);
 				await interaction.reply({
 					embeds: [successEmbed(`${emojis.rightArrow2} Added auto role ${role} (Bot Role: ${botRole}).`)],
 					flags: MessageFlags.Ephemeral,
 				});
 			} catch (err) {
 				if (err instanceof LimitError) {
-					if (err.showQuestUnlimitedPrompt) {
-						await interaction.reply({
-							embeds: [
-								infoEmbed(`${emojis.questUnlimited2} ${err.message} Unlock unlimited auto roles with QuestUnlimited.`),
-							],
-							components: getQuestUnlimitedPurchaseComponents(interaction.client.application.id),
-							flags: MessageFlags.Ephemeral,
-						});
-						return;
-					}
-
 					await interaction.reply({
 						embeds: [errorEmbed(`${emojis.rightArrow2} ${err.message}`)],
 						flags: MessageFlags.Ephemeral,
