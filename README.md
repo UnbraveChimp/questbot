@@ -1,10 +1,10 @@
 <div style="text-align: center;">
 
-  <img src=".github/assets/LargeDuckBanner.png" alt="Duck Organization Banner" />
+  <img src=".github/assets/LargeVanternBanner.png" alt="Vantern Banner" />
 
 ---
 
-  <img src="https://img.shields.io/badge/Created_By_Duck_Organization-white?style=for-the-badge" alt="Created By Badge" />
+  <img src="https://img.shields.io/badge/Created_By_Vantern-white?style=for-the-badge" alt="Created By Badge" />
   <img src="https://img.shields.io/badge/Created_Using-Typescript-blue?style=for-the-badge" alt="Created Using Badge" />
 
 </div>
@@ -24,10 +24,10 @@ Quest Bot is capable of:
 
 # Contributing
 
-Quest Bot is worked on by Duck Organization but we are opensource!
+Quest Bot is worked on by Vantern but we are opensource!
 Anyone can contribute!
 
-Feel free to open a pull request! Just make sure to follow the guidelines at [CONTRIBUTING.md](https://github.com/duck-organization/quest-bot/blob/main/CONTRIBUTING.md).
+Feel free to open a pull request! Just make sure to follow the guidelines at [CONTRIBUTING.md](https://github.com/vantern-org/questbot/blob/main/CONTRIBUTING.md).
 
 ## Running locally
 
@@ -50,8 +50,8 @@ This project is licensed under the Affero GNU General Public License v3.0 (AGPL-
 
 ## Links
 
-[Status Page](https://status.duckorg.com), [Bot Documentation](https://duckorg.com/bot/docs) & [Official Discord](https://discord.gg/ksuqZ77R88)
+[Status Page](https://status.vantern.org), [Bot Documentation](https://vantern.org/bot/docs) & [Official Discord](https://discord.gg/ksuqZ77R88)
 
 ## Contact
 
-If you have any questions or suggestions, feel free to reach out to us on our [Discord server](https://discord.gg/ksuqZ77R88) or send us an email at contact@duckorg.com.
+If you have any questions or suggestions, feel free to reach out to us on our [Discord server](https://discord.gg/ksuqZ77R88) or send us an email at contact@vantern.org.

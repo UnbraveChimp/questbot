@@ -17,7 +17,7 @@ export class GuildDeleteListener extends Listener<typeof Events.GuildDelete> {
 			.setColor(0xffffff)
 			.setTitle('Sorry to see you go!')
 			.setDescription(
-				`If you had any issues or feedback, feel free to join the support server by using the \`/discord\` command.\n\nWe'd also appreciate it if you could fill out our feedback form at https://duckorg.com/feedback/questbot.`,
+				`If you had any issues or feedback, feel free to join the support server by using the \`/discord\` command.\n\nWe'd also appreciate it if you could fill out our feedback form at https://vantern.org/feedback/questbot.`,
 			);
 
 		await owner.send({ embeds: [embed] }).catch(() => null);

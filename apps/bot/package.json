@@ -1,15 +1,15 @@
 {
 	"$schema": "https://json.schemastore.org/package.json",
-	"name": "@duckorganization/questbot",
+	"name": "@questbot/bot",
 	"version": "0.1.5",
 	"private": true,
 	"type": "module",
 	"description": "A Discord bot built with Sapphire framework",
 	"license": "AGPL-3.0-or-later",
-	"author": "Duck Organization",
+	"author": "Vantern",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/duck-organization/quest-bot.git"
+		"url": "git+https://github.com/vantern-org/questbot.git"
 	},
 	"main": "./dist/index.js",
 	"bin": {

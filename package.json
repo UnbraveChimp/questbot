@@ -15,10 +15,10 @@
 		"dev": "dotenv -e .env -- turbo run dev",
 		"lint": "biome check .",
 		"format": "biome check --write .",
-		"start": "pnpm --filter @duckorganization/bot start",
+		"start": "pnpm --filter @questbot/bot start",
 		"db:push": "dotenv -e .env -- turbo run db:push",
 		"db:generate": "dotenv -e .env -- turbo run db:generate",
-		"prisma": "pnpm --filter @duckorganization/bot prisma",
+		"prisma": "pnpm --filter @questbot/bot prisma",
 		"clean": "dotenv -e .env -- turbo run build --force && rm -rf node_modules apps/*/node_modules dist .turbo"
 	},
 	"dependencies": {

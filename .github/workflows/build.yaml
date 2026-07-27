@@ -29,10 +29,10 @@ jobs:
       - name: Build
         run: pnpm turbo build
       - name: Build production image
-        run: docker build -t quest-bot:test .
+        run: docker build -t questbot:test .
       - name: Test production image
         run: >
-          docker run --rm --entrypoint sh quest-bot:test -c
+          docker run --rm --entrypoint sh questbot:test -c
           "set -e;
           test -f /app/apps/bot/dist/index.js;
           node --check /app/apps/bot/dist/index.js"
