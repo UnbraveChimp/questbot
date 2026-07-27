@@ -1,6 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import { EmbedBuilder, Events, type Message, type PartialMessage } from 'discord.js';
 import { removeConfessionContext } from '#lib/confessions.js';
+import { deleteGiveawayByMessageId } from '#lib/giveaways.js';
 import { isLoggingChannel, logEmbed, truncate } from '#lib/logging.js';
 
 export class MessageDeleteListener extends Listener<typeof Events.MessageDelete> {
@@ -32,6 +33,7 @@ export class MessageDeleteListener extends Listener<typeof Events.MessageDelete>
 			.setTimestamp();
 
 		await removeConfessionContext(message.id).catch(() => null);
+		await deleteGiveawayByMessageId(message.id).catch(() => null);
 		await logEmbed(guild, embed);
 	}
 }

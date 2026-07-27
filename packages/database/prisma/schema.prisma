@@ -85,6 +85,7 @@ model Server {
   automods       AutoMod[]
   confessions    Confession[]
   afks           Afk[]
+  giveaways      Giveaway[]
 
   @@map("server")
 }
@@ -223,4 +224,25 @@ model Afk {
   @@unique([guildId, userId])
   @@index([guildId])
   @@map("afks")
+}
+
+model Giveaway {
+  id         String   @id @default(cuid())
+  guildId    String
+  channelId  String
+  messageId  String?  @unique
+  hostId     String
+  prize      String
+  maxEntries Int?
+  entries    String[] @default([])
+  winnerIds  String[] @default([])
+  ended      Boolean  @default(false)
+  endsAt     DateTime
+  createdAt  DateTime @default(now())
+
+  server     Server   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId])
+  @@index([ended, endsAt])
+  @@map("giveaways")
 }

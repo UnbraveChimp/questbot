@@ -1,6 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import { ActivityType, type Client, Events } from 'discord.js';
 import { purgeExpiredBans } from '#lib/bans.js';
+import { giveawayScheduler } from '#lib/giveawayEvent.js';
 import { enforceMute, getActiveMutes } from '#lib/mutes.js';
 import { reminderScheduler } from '#lib/reminderEvent.js';
 import { purgeExpiredWarns } from '#lib/warns.js';
@@ -26,7 +27,9 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
 		});
 
 		heartbeat(client);
+		//* all schedulers currently run on a 30s interval
 		reminderScheduler(client);
+		giveawayScheduler(client);
 
 		const enforceMutes = async () => {
 			const mutes = await getActiveMutes();
