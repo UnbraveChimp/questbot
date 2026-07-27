@@ -23,7 +23,7 @@
 		"prepublishOnly": "pnpm build"
 	},
 	"dependencies": {
-		"@discordjs/core": "^2.4.0",
+		"@discordjs/core": "^2.6.0",
 		"@questbot/database": "workspace:*",
 		"@sapphire/framework": "^5.5.0",
 		"@types/ms": "^2.1.0",
