@@ -1,6 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import { Events, type Message } from 'discord.js';
 import { containsBlockedWord } from '#lib/automod.js';
+import { autoPublish } from '#lib/autoPublisher.js';
 import { isHaiku } from '#lib/haiku.js';
 import { getSettings } from '#lib/settings.js';
 
@@ -22,9 +23,7 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 			await message.reply("That's a haiku!").catch((err) => console.error(err));
 		}
 
-		if (message.author.bot) return;
-
-		if (await containsBlockedWord(message.guild.id, message.content)) {
+		if (!message.author.bot && (await containsBlockedWord(message.guild.id, message.content))) {
 			await message.delete().catch((err) => console.error(err));
 
 			const channel = message.channel;
@@ -33,7 +32,13 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 			await channel.send(`<@${message.author.id}>, that word is not allowed here!`).catch((err) => {
 				console.error(err);
 			});
+			return;
 		}
+		if (settings.autoPublisher) {
+			await autoPublish(message);
+		}
+
+		if (message.author.bot) return;
 
 		const moderatorIds = [
 			...new Set(

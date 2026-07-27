@@ -240,6 +240,33 @@ function buildHaikuPanel(settings: ServerSettings, status?: string) {
 	};
 }
 
+function buildAutoPublisherPanel(settings: ServerSettings, status?: string) {
+	const toggleMenu = new StringSelectMenuBuilder()
+		.setCustomId('autoPublisherToggle')
+		.setPlaceholder(`${settings.autoPublisher ? 'Enabled' : 'Disabled'}`)
+		.addOptions(
+			new StringSelectMenuOptionBuilder()
+				.setLabel('Enable')
+				.setDescription('Automatically publish messages posted in announcement channels.')
+				.setValue('enable'),
+			new StringSelectMenuOptionBuilder()
+				.setLabel('Disable')
+				.setDescription("Don't publish announcements automatically.")
+				.setValue('disable'),
+		);
+
+	return {
+		embeds: [
+			infoEmbed(
+				status
+					? `${emojis.rightArrow1} **Auto Publisher** module:\n${emojis.rightArrow2} ${status}`
+					: `${emojis.rightArrow1} **Auto Publisher** module:\n${emojis.rightArrow2} I need **Manage Messages** (in your announcement channels) to publish other people's messages.`,
+			),
+		],
+		components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(toggleMenu)],
+	};
+}
+
 async function normalizeTicketSettings(guildId: string, guild: Guild, settings: ServerSettings) {
 	if (!settings.ticketCategoryId) return settings;
 
@@ -301,6 +328,10 @@ export class SettingsCommand extends Command {
 					.setLabel('Haiku')
 					.setDescription('Reply when a message forms a haiku.')
 					.setValue('haiku'),
+				new StringSelectMenuOptionBuilder()
+					.setLabel('Auto Publisher')
+					.setDescription('Automatically publish messages posted in announcement channels.')
+					.setValue('autoPublisher'),
 			);
 
 		const response = await interaction.reply({
@@ -350,6 +381,8 @@ export class SettingsCommand extends Command {
 				await settingChoice.update(buildConfessionPanel(settings, guild));
 			} else if (settingChoice.values[0] === 'haiku') {
 				await settingChoice.update(buildHaikuPanel(settings));
+			} else if (settingChoice.values[0] === 'autoPublisher') {
+				await settingChoice.update(buildAutoPublisherPanel(settings));
 			} else {
 				return;
 			}
@@ -422,6 +455,11 @@ export class SettingsCommand extends Command {
 					const next = await updateSettings(guildId, guild.name, { haikuEnabled: enable });
 
 					await i.update(buildHaikuPanel(next, `Haiku **${enable ? 'enabled' : 'disabled'}**.`));
+				} else if (i.customId === 'autoPublisherToggle' && i.isStringSelectMenu()) {
+					const enable = i.values[0] === 'enable';
+					const next = await updateSettings(guildId, guild.name, { autoPublisher: enable });
+
+					await i.update(buildAutoPublisherPanel(next, `Auto Publisher **${enable ? 'enabled' : 'disabled'}**.`));
 				}
 			});
 

@@ -11,6 +11,7 @@ export type ServerSettings = {
 	loggingEnabled?: boolean;
 	loggingChannelId?: string | null;
 	haikuEnabled?: boolean;
+	autoPublisher?: boolean;
 };
 
 export const DefaultSettings: ServerSettings = {
@@ -24,6 +25,7 @@ export const DefaultSettings: ServerSettings = {
 	loggingEnabled: false,
 	loggingChannelId: null,
 	haikuEnabled: false,
+	autoPublisher: false,
 };
 
 export async function getSettings(guildId: string, guildName: string): Promise<ServerSettings> {
