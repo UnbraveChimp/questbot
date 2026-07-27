@@ -6,7 +6,7 @@ const ownerDmCooldown = new Map<string, number>();
 const DM_COOLDOWN = 24 * 60 * 60 * 1000; // 24h
 
 export async function sendWelcome(member: GuildMember): Promise<void> {
-	const settings = await getSettings(member.guild.id, member.guild.name);
+	const settings = await getSettings(member.guild.id);
 	if (!settings.welcomePeople || !settings.welcomeChannelId) return;
 
 	const channel = await member.guild.channels.fetch(settings.welcomeChannelId).catch(() => null);

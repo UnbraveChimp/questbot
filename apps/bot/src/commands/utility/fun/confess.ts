@@ -38,7 +38,7 @@ export class ConfessCommand extends Command {
 			return;
 		}
 
-		const settings = await getSettings(interaction.guild.id, interaction.guild.name);
+		const settings = await getSettings(interaction.guild.id);
 
 		if (settings.confessionEnabled === false) {
 			await interaction.reply({

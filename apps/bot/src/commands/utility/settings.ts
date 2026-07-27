@@ -369,7 +369,7 @@ export class SettingsCommand extends Command {
 				return;
 			}
 
-			const settings = await normalizeTicketSettings(guildId, guild, await getSettings(guildId, guild.name));
+			const settings = await normalizeTicketSettings(guildId, guild, await getSettings(guildId));
 
 			if (settingChoice.values[0] === 'welcome') {
 				await settingChoice.update(buildWelcomePanel(settings, guild));

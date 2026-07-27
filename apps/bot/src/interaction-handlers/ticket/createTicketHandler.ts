@@ -70,7 +70,7 @@ export class ButtonHandler extends InteractionHandler {
 		});
 
 		const reason = modalSubmit.fields.getTextInputValue('ticket-reason');
-		const settings = await getSettings(interaction.guild.id, interaction.guild.name);
+		const settings = await getSettings(interaction.guild.id);
 		let parent: string | undefined;
 
 		if (settings.ticketCategoryId) {

@@ -185,7 +185,7 @@ export class ButtonHandler extends InteractionHandler {
 
 		try {
 			if (ticket && channel.isTextBased()) {
-				const settings = await getSettings(interaction.guild.id, interaction.guild.name);
+				const settings = await getSettings(interaction.guild.id);
 
 				// Send transcript if configured
 				if (settings.ticketTranscriptChannelId) {

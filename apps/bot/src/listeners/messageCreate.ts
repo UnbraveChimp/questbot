@@ -18,7 +18,7 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 
 		// by doing this you ALLOW it to reply to bots haiku's such as ai bots writing one :D
 		const content = message.content.toLowerCase();
-		const settings = await getSettings(message.guild.id, message.guild.name);
+		const settings = await getSettings(message.guild.id);
 		if (settings.haikuEnabled && isHaiku(message.content)) {
 			await message.reply("That's a haiku!").catch((err) => console.error(err));
 		}
