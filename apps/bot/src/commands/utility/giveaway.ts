@@ -54,6 +54,9 @@ export class GiveawayCommand extends Command {
 								.setDescription('Maximum number of entries allowed')
 								.setMinValue(1)
 								.setMaxValue(10_000_000),
+						)
+						.addIntegerOption((option: SlashCommandIntegerOption) =>
+							option.setName('winners').setDescription('Amount of winners to pick').setMinValue(1).setMaxValue(100),
 						),
 				)
 				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
@@ -116,6 +119,7 @@ export class GiveawayCommand extends Command {
 		const prize = interaction.options.getString('prize', true);
 		const durationStr = interaction.options.getString('duration', true) as StringValue;
 		const maxEntries = interaction.options.getInteger('max_entries') ?? undefined;
+		const winners = interaction.options.getInteger('winners') ?? undefined;
 
 		const duration = ms(durationStr);
 		if (typeof duration !== 'number' || Number.isNaN(duration) || duration <= 0) {
@@ -152,6 +156,7 @@ export class GiveawayCommand extends Command {
 			prize,
 			endsAt,
 			maxEntries,
+			winners,
 		);
 
 		let message: Message;

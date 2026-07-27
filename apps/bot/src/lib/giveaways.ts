@@ -36,6 +36,7 @@ export function buildGiveawayEmbed(giveaway: GiveawayView): EmbedBuilder {
 		.setDescription(
 			[
 				`**Prize:** ${giveaway.prize}`,
+				`**Winners:** ${giveaway.winnerCount}`,
 				`**Ends:** <t:${unix}:R>`,
 				`**Hosted by:** <@${giveaway.hostId}>`,
 				`**Entries:** ${entriesLine}`,
@@ -101,6 +102,7 @@ export async function createGiveaway(
 	prize: string,
 	endsAt: Date,
 	maxEntries?: number,
+	winnerCount?: number,
 ) {
 	await prisma.server.upsert({
 		where: { id: guildId },
@@ -109,7 +111,7 @@ export async function createGiveaway(
 	});
 
 	return prisma.giveaway.create({
-		data: { guildId, channelId, hostId, prize, endsAt, maxEntries },
+		data: { guildId, channelId, hostId, prize, endsAt, maxEntries, winnerCount },
 	});
 }
 
@@ -206,7 +208,7 @@ export async function finishGiveaway(giveawayId: string): Promise<FinishGiveaway
 		if (!giveaway) return { status: 'not-found' };
 		if (giveaway.ended) return { status: 'already-ended' };
 
-		const winnerIds = pickWinners(giveaway.entries, 1);
+		const winnerIds = pickWinners(giveaway.entries, giveaway.winnerCount);
 		const updated = await tx.giveaway.update({
 			where: { id: giveawayId },
 			data: { ended: true, winnerIds },
