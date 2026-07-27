@@ -23,7 +23,7 @@ export class AutoModCommand extends Command {
 		registry.registerChatInputCommand((builder) =>
 			builder
 				.setName('automod')
-				.setDescription('Block words from being said!')
+				.setDescription('Keep your server clean!')
 				.setDefaultMemberPermissions(0)
 				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
 					subcommand
