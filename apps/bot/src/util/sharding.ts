@@ -38,13 +38,22 @@ export function startShardedPoller<T>({
 	handle,
 	intervalMs = INTERVAL,
 }: ShardedPollerOptions<T>): void {
+	let isTickRunning = false;
+
 	const tick = async () => {
+		if (isTickRunning) {
+			return;
+		}
+
+		isTickRunning = true;
 		try {
 			const due = await getDue(getShardInfo(client));
 
 			await Promise.allSettled(due.map((item) => handle(item).catch((err) => console.error(err))));
 		} catch (err) {
 			console.error(err);
+		} finally {
+			isTickRunning = false;
 		}
 	};
 
