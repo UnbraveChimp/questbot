@@ -11,6 +11,7 @@ import {
 	type SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import ms, { type StringValue } from 'ms';
+import { containsBlockedWord } from '#lib/automod.js';
 import { endGiveaway } from '#lib/giveawayEvent.js';
 import {
 	buildGiveawayComponents,
@@ -141,6 +142,14 @@ export class GiveawayCommand extends Command {
 		if (!interaction.channel?.isSendable()) {
 			await interaction.reply({
 				embeds: [errorEmbed(`${emojis.rightArrow2} I can't post a giveaway in this channel.`)],
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
+
+		if (await containsBlockedWord(interaction.guildId, prize)) {
+			await interaction.reply({
+				embeds: [errorEmbed(`${emojis.rightArrow2} That prize contains a word blocked by this server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;

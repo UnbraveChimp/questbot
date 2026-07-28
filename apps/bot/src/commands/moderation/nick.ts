@@ -7,6 +7,7 @@ import {
 	type SlashCommandStringOption,
 	type SlashCommandUserOption,
 } from 'discord.js';
+import { containsBlockedWord } from '#lib/automod.js';
 import { errorEmbed, successEmbed } from '#utils/embeds.js';
 import { emojis } from '#utils/emoji.js';
 
@@ -79,6 +80,14 @@ export class NickCommand extends Command {
 		if (!targetMember.manageable) {
 			await interaction.reply({
 				embeds: [errorEmbed(`${emojis.rightArrow2} I cannot manage this member's nickname.`)],
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
+
+		if (nickname && (await containsBlockedWord(interaction.guild.id, nickname))) {
+			await interaction.reply({
+				embeds: [errorEmbed(`${emojis.rightArrow2} That nickname contains a word blocked by this server.`)],
 				flags: MessageFlags.Ephemeral,
 			});
 			return;
