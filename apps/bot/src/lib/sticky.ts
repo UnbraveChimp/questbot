@@ -29,6 +29,13 @@ export async function getSticky(guildId: string, channelId: string): Promise<Sti
 }
 
 export function forgetStickies(guildId: string): void {
+	const cached = stickyCache.get(guildId);
+	if (cached) {
+		for (const sticky of cached.stickies) {
+			lastRepostAt.delete(sticky.id);
+			pendingRepost.delete(sticky.id);
+		}
+	}
 	stickyCache.delete(guildId);
 }
 
@@ -54,6 +61,8 @@ export async function removeSticky(guildId: string, channelId: string): Promise<
 		where: { id: channelId, stickyContent: { not: null } },
 		data: { stickyContent: null, stickyMessageId: null },
 	});
+	lastRepostAt.delete(channelId);
+	pendingRepost.delete(channelId);
 	stickyCache.delete(guildId);
 
 	return count > 0;
