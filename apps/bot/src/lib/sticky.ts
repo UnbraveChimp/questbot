@@ -64,8 +64,8 @@ export async function repostSticky(channel: GuildTextBasedChannel, sticky: Stick
 
 	const since = Date.now() - (lastRepostAt.get(channel.id) ?? 0);
 
-    // when a new message is sent while on cooldown, we queue it and send it after the cooldown (5s)
- 	if (!force && since < 5_000) {
+	// when a new message is sent while on cooldown, we queue it and send it after the cooldown (5s)
+	if (!force && since < 5_000) {
 		if (pendingRepost.has(channel.id)) return;
 		pendingRepost.add(channel.id);
 

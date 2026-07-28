@@ -40,7 +40,7 @@ export async function getRecentAuditLogEntry(guild: Guild, type: AuditLogEvent, 
 	);
 }
 
-export function truncate(text: string | null | undefined, length = 1900) {
+export function truncate(text: string | null | undefined, length = 1024): string {
 	if (!text) return '';
-	return text.length > length ? `${text.slice(0, length)}…` : text;
+	return text.length > length ? `${text.slice(0, length - 1)}…` : text;
 }
