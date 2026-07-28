@@ -23,7 +23,9 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 			await message.reply("That's a haiku!").catch((err) => console.error(err));
 		}
 
-		if (!message.author.bot && (await containsBlockedWord(message.guild.id, message.content))) {
+		const isBlocked = await containsBlockedWord(message.guild.id, message.content);
+
+		if (isBlocked && !message.author.bot) {
 			await message.delete().catch((err) => console.error(err));
 
 			const channel = message.channel;
@@ -34,7 +36,8 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 			});
 			return;
 		}
-		if (settings.autoPublisher) {
+
+		if (settings.autoPublisher && !isBlocked) {
 			await autoPublish(message);
 		}
 

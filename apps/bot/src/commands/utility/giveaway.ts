@@ -54,7 +54,7 @@ export class GiveawayCommand extends Command {
 								.setName('max_entries')
 								.setDescription('Maximum number of entries allowed')
 								.setMinValue(1)
-								.setMaxValue(10_000_000),
+								.setMaxValue(10000),
 						)
 						.addIntegerOption((option: SlashCommandIntegerOption) =>
 							option.setName('winners').setDescription('Amount of winners to pick').setMinValue(1).setMaxValue(100),
@@ -119,7 +119,7 @@ export class GiveawayCommand extends Command {
 	private async handleStart(interaction: Command.ChatInputCommandInteraction<'cached'>) {
 		const prize = interaction.options.getString('prize', true);
 		const durationStr = interaction.options.getString('duration', true) as StringValue;
-		const maxEntries = interaction.options.getInteger('max_entries') ?? undefined;
+		const maxEntries = interaction.options.getInteger('max_entries') ?? 10000;
 		const winners = interaction.options.getInteger('winners') ?? undefined;
 
 		const duration = ms(durationStr);

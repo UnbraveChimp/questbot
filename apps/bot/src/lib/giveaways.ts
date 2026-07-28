@@ -1,3 +1,4 @@
+import { randomInt } from 'node:crypto';
 import { Prisma, prisma } from '@questbot/database';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, type Client, EmbedBuilder } from 'discord.js';
 import { Colors } from '#utils/embeds.js';
@@ -229,7 +230,7 @@ export function pickWinners(entries: string[], count: number): string[] {
 	const winners: string[] = [];
 
 	while (winners.length < count && pool.length > 0) {
-		const index = Math.floor(Math.random() * pool.length);
+		const index = randomInt(pool.length);
 		winners.push(pool[index]!);
 		pool.splice(index, 1);
 	}
