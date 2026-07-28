@@ -1,6 +1,9 @@
 import { prisma } from '@questbot/database';
 import { Listener } from '@sapphire/framework';
 import { EmbedBuilder, Events, type Guild } from 'discord.js';
+import { forgetBlockedWords } from '#lib/automod.js';
+import { forgetSettings } from '#lib/settings.js';
+import { forgetStickies } from '#lib/sticky.js';
 
 export class GuildDeleteListener extends Listener<typeof Events.GuildDelete> {
 	public constructor(context: Listener.LoaderContext, options: Listener.Options) {
@@ -9,6 +12,9 @@ export class GuildDeleteListener extends Listener<typeof Events.GuildDelete> {
 
 	public async run(guild: Guild) {
 		await prisma.server.delete({ where: { id: guild.id } }).catch(() => null);
+		forgetSettings(guild.id);
+		forgetBlockedWords(guild.id);
+		forgetStickies(guild.id);
 
 		const owner = await guild.client.users.fetch(guild.ownerId).catch(() => null);
 		if (!owner) return;
@@ -17,7 +23,7 @@ export class GuildDeleteListener extends Listener<typeof Events.GuildDelete> {
 			.setColor(0xffffff)
 			.setTitle('Sorry to see you go!')
 			.setDescription(
-				`If you had any issues or feedback, feel free to join the support server by using the \`/discord\` command.\n\nWe'd also appreciate it if you could fill out our feedback form at https://duckorg.com/feedback/questbot.`,
+				`If you had any issues or have feedback, feel free to join the support server by using the \`/discord\` command.\n\nWe'd also appreciate it if you could fill out our feedback form at https://vantern.org/feedback/deletion. Thank you in advance!`,
 			);
 
 		await owner.send({ embeds: [embed] }).catch(() => null);

@@ -1,5 +1,6 @@
-import { prisma } from '@questbot/database';
+import { Prisma, prisma } from '@questbot/database';
 import type { Guild } from 'discord.js';
+import { type ShardInfo, shardOwns } from '#utils/sharding.js';
 
 export async function createMute(
 	guildId: string,
@@ -32,12 +33,12 @@ export async function getMute(guildId: string, userId: string) {
 	});
 }
 
-export async function getActiveMutes() {
-	return prisma.mute.findMany({
-		where: {
-			OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-		},
-	});
+export async function getActiveMutes(shard: ShardInfo) {
+	return prisma.$queryRaw<Prisma.MuteModel[]>`
+		SELECT * FROM "Mute"
+		WHERE ("expiresAt" IS NULL OR "expiresAt" > ${new Date()})
+			AND ${shardOwns(Prisma.sql`"guildId"::bigint`, shard)}
+	`;
 }
 
 export async function enforceMute(guild: Guild, userId: string): Promise<boolean> {

@@ -2,7 +2,7 @@ import type { AuditLogEvent, EmbedBuilder, Guild } from 'discord.js';
 import { getSettings } from '#lib/settings.js';
 
 export async function logEmbed(guild: Guild, embed: EmbedBuilder) {
-	const settings = await getSettings(guild.id, guild.name).catch((err) => {
+	const settings = await getSettings(guild.id).catch((err) => {
 		console.error(err);
 		return null;
 	});
@@ -18,7 +18,7 @@ export async function logEmbed(guild: Guild, embed: EmbedBuilder) {
 export async function isLoggingChannel(guild: Guild, channelId: string | null | undefined) {
 	if (!channelId) return false;
 
-	const settings = await getSettings(guild.id, guild.name).catch((err) => {
+	const settings = await getSettings(guild.id).catch((err) => {
 		console.error(err);
 		return null;
 	});
@@ -40,7 +40,7 @@ export async function getRecentAuditLogEntry(guild: Guild, type: AuditLogEvent, 
 	);
 }
 
-export function truncate(text: string | null | undefined, length = 1900) {
+export function truncate(text: string | null | undefined, length = 1024): string {
 	if (!text) return '';
-	return text.length > length ? `${text.slice(0, length)}…` : text;
+	return text.length > length ? `${text.slice(0, length - 1)}…` : text;
 }

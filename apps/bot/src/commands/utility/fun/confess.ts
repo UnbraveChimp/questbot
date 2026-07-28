@@ -13,6 +13,7 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 } from 'discord.js';
+import { containsBlockedWord } from '#lib/automod.js';
 import { isConfessionBlacklisted, storeConfessionContext } from '#lib/confessions.js';
 import { getSettings } from '#lib/settings.js';
 import { errorEmbed, successEmbed } from '#utils/embeds.js';
@@ -38,7 +39,7 @@ export class ConfessCommand extends Command {
 			return;
 		}
 
-		const settings = await getSettings(interaction.guild.id, interaction.guild.name);
+		const settings = await getSettings(interaction.guild.id);
 
 		if (settings.confessionEnabled === false) {
 			await interaction.reply({
@@ -98,6 +99,13 @@ export class ConfessCommand extends Command {
 		}
 
 		const confession = modalSubmit.fields.getTextInputValue('confession-text');
+
+		if (await containsBlockedWord(interaction.guild.id, confession)) {
+			await modalSubmit.editReply({
+				embeds: [errorEmbed(`${emojis.rightArrow2} Your confession contains a word blocked by this server.`)],
+			});
+			return;
+		}
 
 		const confessionChannel = await interaction.guild.channels.fetch(settings.confessionChannelId).catch(() => null);
 

@@ -8,6 +8,24 @@ export class DuplicateAutoModError extends Error {
 	}
 }
 
+const blockedWordsCache = new Map<string, { words: string[]; expiresAt: number }>();
+
+async function getBlockedWords(guildId: string): Promise<string[]> {
+	const cached = blockedWordsCache.get(guildId);
+	if (cached && cached.expiresAt > Date.now()) return cached.words;
+
+	const rows = await prisma.autoMod.findMany({ where: { guildId }, select: { word: true } });
+	const words = rows.map((row) => row.word.trim().toLowerCase()).filter(Boolean);
+
+	blockedWordsCache.set(guildId, { words, expiresAt: Date.now() + 5 * 60 * 1000 }); // 5 min ttl
+
+	return words;
+}
+
+export function forgetBlockedWords(guildId: string): void {
+	blockedWordsCache.delete(guildId);
+}
+
 export async function createAutoMod(guildId: string, guildName: string, word: string) {
 	if (!word?.trim()) {
 		throw new Error('Automod word cannot be empty.');
@@ -27,24 +45,15 @@ export async function createAutoMod(guildId: string, guildName: string, word: st
 			create: { id: guildId, name: guildName },
 			update: { name: guildName },
 		});
-
-		try {
-			return await prisma.autoMod.create({
-				data: { guildId, word },
-			});
-		} catch (error) {
-			if ((error as { code?: string }).code === 'P2002') {
-				throw new DuplicateAutoModError();
-			}
-
-			throw error;
-		}
 	}
 
 	try {
-		return await prisma.autoMod.create({
+		const created = await prisma.autoMod.create({
 			data: { guildId, word },
 		});
+		blockedWordsCache.delete(guildId);
+
+		return created;
 	} catch (error) {
 		if ((error as { code?: string }).code === 'P2002') {
 			throw new DuplicateAutoModError();
@@ -62,17 +71,25 @@ export async function getAutoMods(guildId: string) {
 }
 
 export async function containsBlockedWord(guildId: string, text: string): Promise<boolean> {
-	const autoMods = await getAutoMods(guildId);
+	const words = await getBlockedWords(guildId);
+	if (words.length === 0) return false;
+
 	const lowerText = text.toLowerCase();
-	return autoMods.some((autoMod) => autoMod.word.trim() && lowerText.includes(autoMod.word.toLowerCase()));
+	return words.some((word) => lowerText.includes(word));
 }
 
 export async function removeAutoMod(autoModId: string) {
-	return prisma.autoMod.delete({ where: { id: autoModId } });
+	const removed = await prisma.autoMod.delete({ where: { id: autoModId } });
+	blockedWordsCache.delete(removed.guildId);
+
+	return removed;
 }
 
 export async function clearAutoMods(guildId: string) {
-	return prisma.autoMod.deleteMany({ where: { guildId } });
+	const removed = await prisma.autoMod.deleteMany({ where: { guildId } });
+	blockedWordsCache.delete(guildId);
+
+	return removed;
 }
 
 export async function getAutoMod(autoModId: string) {

@@ -1,6 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import { Events, type Message } from 'discord.js';
 import { containsBlockedWord } from '#lib/automod.js';
+import { autoPublish } from '#lib/autoPublisher.js';
 import { isHaiku } from '#lib/haiku.js';
 import { getSettings } from '#lib/settings.js';
 
@@ -17,14 +18,14 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 
 		// by doing this you ALLOW it to reply to bots haiku's such as ai bots writing one :D
 		const content = message.content.toLowerCase();
-		const settings = await getSettings(message.guild.id, message.guild.name);
+		const settings = await getSettings(message.guild.id);
 		if (settings.haikuEnabled && isHaiku(message.content)) {
 			await message.reply("That's a haiku!").catch((err) => console.error(err));
 		}
 
-		if (message.author.bot) return;
+		const isBlocked = await containsBlockedWord(message.guild.id, message.content);
 
-		if (await containsBlockedWord(message.guild.id, message.content)) {
+		if (isBlocked && !message.author.bot) {
 			await message.delete().catch((err) => console.error(err));
 
 			const channel = message.channel;
@@ -33,7 +34,14 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 			await channel.send(`<@${message.author.id}>, that word is not allowed here!`).catch((err) => {
 				console.error(err);
 			});
+			return;
 		}
+
+		if (settings.autoPublisher && !isBlocked) {
+			await autoPublish(message);
+		}
+
+		if (message.author.bot) return;
 
 		const moderatorIds = [
 			...new Set(

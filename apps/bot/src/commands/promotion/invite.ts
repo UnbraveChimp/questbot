@@ -14,6 +14,6 @@ export class InviteCommand extends Command {
 	}
 
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		await interaction.reply({ embeds: [infoEmbed(`${emojis.rightArrow1} https://duckorg.com/bot/invite`)] });
+		await interaction.reply({ embeds: [infoEmbed(`${emojis.rightArrow1} https://vantern.org/bot/invite`)] });
 	}
 }

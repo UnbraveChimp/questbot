@@ -6,6 +6,7 @@ import {
 	type SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import ms, { type StringValue } from 'ms';
+import { containsBlockedWord } from '#lib/automod.js';
 import { LimitError } from '#lib/limits.js';
 import { createReminder, getReminder, removeReminder } from '#lib/reminders.js';
 import { errorEmbed, infoEmbed, successEmbed } from '#utils/embeds.js';
@@ -62,6 +63,14 @@ export class ReminderCommand extends Command {
 			if (duration > 31_536_000_000) {
 				await interaction.reply({
 					embeds: [errorEmbed(`${emojis.rightArrow2} Reminder cannot be longer than 1 year.`)],
+					flags: MessageFlags.Ephemeral,
+				});
+				return;
+			}
+
+			if (interaction.inCachedGuild() && (await containsBlockedWord(interaction.guild.id, message))) {
+				await interaction.reply({
+					embeds: [errorEmbed(`${emojis.rightArrow2} That reminder contains a word blocked by this server.`)],
 					flags: MessageFlags.Ephemeral,
 				});
 				return;

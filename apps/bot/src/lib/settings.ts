@@ -11,6 +11,7 @@ export type ServerSettings = {
 	loggingEnabled?: boolean;
 	loggingChannelId?: string | null;
 	haikuEnabled?: boolean;
+	autoPublisher?: boolean;
 };
 
 export const DefaultSettings: ServerSettings = {
@@ -24,15 +25,29 @@ export const DefaultSettings: ServerSettings = {
 	loggingEnabled: false,
 	loggingChannelId: null,
 	haikuEnabled: false,
+	autoPublisher: false,
 };
 
-export async function getSettings(guildId: string, guildName: string): Promise<ServerSettings> {
-	const row = await prisma.server.upsert({
+// caching rather than ending up fetching the settings basically each message
+const settingsCache = new Map<string, { settings: ServerSettings; expiresAt: number }>();
+
+async function readSettings(guildId: string): Promise<ServerSettings> {
+	const row = await prisma.server.findUnique({
 		where: { id: guildId },
-		create: { id: guildId, name: guildName, settings: DefaultSettings as Prisma.InputJsonValue },
-		update: { name: guildName },
+		select: { settings: true },
 	});
-	return { ...DefaultSettings, ...(row.settings as Partial<ServerSettings>) };
+
+	return { ...DefaultSettings, ...((row?.settings ?? {}) as Partial<ServerSettings>) };
+}
+
+export async function getSettings(guildId: string): Promise<ServerSettings> {
+	const cached = settingsCache.get(guildId);
+	if (cached && cached.expiresAt > Date.now()) return cached.settings;
+
+	const settings = await readSettings(guildId);
+	settingsCache.set(guildId, { settings, expiresAt: Date.now() + 5 * 60 * 1000 }); // 5 min ttl
+
+	return settings;
 }
 
 export async function updateSettings(
@@ -40,19 +55,20 @@ export async function updateSettings(
 	guildName: string,
 	patch: Partial<ServerSettings>,
 ): Promise<ServerSettings> {
-	const row = await prisma.server.upsert({
-		where: { id: guildId },
-		create: { id: guildId, name: guildName, settings: DefaultSettings as Prisma.InputJsonValue },
-		update: { name: guildName },
-	});
-
-	const current = { ...DefaultSettings, ...(row.settings as Partial<ServerSettings>) };
+	const current = await readSettings(guildId);
 	const next = { ...current, ...patch };
 
-	await prisma.server.update({
+	await prisma.server.upsert({
 		where: { id: guildId },
-		data: { name: guildName, settings: next as Prisma.InputJsonValue },
+		create: { id: guildId, name: guildName, settings: next as Prisma.InputJsonValue },
+		update: { name: guildName, settings: next as Prisma.InputJsonValue },
 	});
 
+	settingsCache.set(guildId, { settings: next, expiresAt: Date.now() + 5 * 60 * 1000 }); // 5 min ttl
+
 	return next;
+}
+
+export function forgetSettings(guildId: string): void {
+	settingsCache.delete(guildId);
 }

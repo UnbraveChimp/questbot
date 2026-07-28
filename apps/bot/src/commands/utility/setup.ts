@@ -141,7 +141,7 @@ export class SetupCommand extends Command {
 			return;
 		}
 
-		let settings = await getSettings(guildId, guild.name);
+		let settings = await getSettings(guildId);
 		const summary: string[] = [];
 
 		// 1. welcome messages

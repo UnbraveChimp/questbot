@@ -14,6 +14,6 @@ export class DiscordCommand extends Command {
 	}
 
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		await interaction.reply({ embeds: [infoEmbed(`${emojis.rightArrow1} https://duckorg.com/discord`)] });
+		await interaction.reply({ embeds: [infoEmbed(`${emojis.rightArrow1} https://vantern.org/discord`)] });
 	}
 }

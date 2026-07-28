@@ -31,7 +31,7 @@ export class HelpCommand extends Command {
 		const embed = new EmbedBuilder().setTitle('Commands').setDescription(commandList).addFields({
 			name: 'Links',
 			value:
-				'**Status:** https://status.duckorg.com/\n**Official Discord Server:** https://discord.gg/F4HYE8frK2\n**Documentation:** https://docs.duckorg.com/',
+				'**Status:** https://status.vantern.org/\n**Official Discord Server:** https://discord.gg/F4HYE8frK2\n**Documentation:** https://docs.vantern.org/',
 		});
 
 		await interaction.reply({
