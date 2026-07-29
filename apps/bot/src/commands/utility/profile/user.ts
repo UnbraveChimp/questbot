@@ -2,6 +2,7 @@ import { Command } from '@sapphire/framework';
 import {
 	EmbedBuilder,
 	type GuildMember,
+	type SlashCommandBooleanOption,
 	type SlashCommandBuilder,
 	type SlashCommandSubcommandBuilder,
 	type SlashCommandUserOption,
@@ -48,6 +49,11 @@ export class UserCommand extends Command {
 					addUserOption(
 						subcommand.setName('pfp').setDescription("Easily download or view your own or someone else's pfp."),
 						'The user whose profile picture you want to view',
+					).addBooleanOption((option: SlashCommandBooleanOption) =>
+						option
+							.setName('global')
+							.setDescription('Whether to view the global version of the profile picture')
+							.setRequired(false),
 					),
 				)
 				.addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
@@ -88,7 +94,12 @@ export class UserCommand extends Command {
 	}
 
 	private async sendPfp(interaction: Command.ChatInputCommandInteraction, user: User) {
-		const avatarUrl = user.displayAvatarURL({ size: ASSET_SIZE });
+		const global = interaction.options.getBoolean('global') ?? false;
+
+		const member =
+			!global && interaction.inCachedGuild() ? (interaction.options.getMember('user') ?? interaction.member) : null;
+
+		const avatarUrl = (member ?? user).displayAvatarURL({ size: ASSET_SIZE });
 
 		await interaction.editReply(assetMessage(user, avatarUrl));
 	}
