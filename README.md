@@ -4,7 +4,7 @@
 
 ---
 
-  <img src="https://img.shields.io/badge/Created_By_Vantern-white?style=for-the-badge" alt="Created By Badge" />
+  <img src="https://img.shields.io/badge/Created%20By-Vantern-1e293b?style=for-the-badge&labelColor=ffffff" alt="Created By Badge" />
   <img src="https://img.shields.io/badge/Created_Using-Typescript-blue?style=for-the-badge" alt="Created Using Badge" />
 
 </div>
