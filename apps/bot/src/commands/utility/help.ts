@@ -24,14 +24,14 @@ export class HelpCommand extends Command {
 				// biome-ignore lint/complexity/useLiteralKeys: x
 				const commandName = cmd.applicationCommandRegistry['apiCalls'][0]?.builtData.name ?? cmd.name;
 
-				return `${emojis.rightArrow1} **/${commandName}** - ${description}`;
+				return `${emojis.rightArrow1} \`${commandName}\` - ${description}`;
 			})
 			.join('\n');
 
 		const embed = new EmbedBuilder().setTitle('Commands').setDescription(commandList).addFields({
 			name: 'Links',
 			value:
-				'**Status:** https://status.vantern.org/\n**Official Discord Server:** https://discord.gg/F4HYE8frK2\n**Documentation:** https://docs.vantern.org/',
+				'Status: https://status.vantern.org/\nOfficial Discord Server: https://discord.gg/F4HYE8frK2\nDocumentation: https://docs.vantern.org/',
 		});
 
 		await interaction.reply({
