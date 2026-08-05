@@ -55,7 +55,7 @@ export async function syncStarboard(reaction: MessageReaction): Promise<void> {
 	const settings = await getSettings(message.guildId);
 	if (!settings.starboardEnable || !settings.starboardChannelId) return;
 
-	if (message.channelId === settings.starboardChannelId) return;
+	if (message.author.id === message.client.user.id && message.channelId === settings.starboardChannelId) return; //* don't post our own messages from the starboard channel but allow other users to be posted from the starboard channel
 	if (normalize(reactionEmoji(full)) !== normalize(settings.starboardEmoji)) return;
 
 	const emoji = settings.starboardEmoji ?? reactionEmoji(full);
