@@ -612,9 +612,9 @@ export class SettingsCommand extends Command {
 					if (!submitted) return;
 
 					const emoji = submitted.fields.getTextInputValue('value').trim();
-					const custom = /^<a?:\w{2,32}:(\d{17,20})>$/.exec(emoji); // regex for filtering out custom emojis
+					const custom = /^<a?:\w{2,32}:(\d{17,20})>$/.exec(emoji); // regex for custom emojis
 
-					if (!custom && !/^\p{Extended_Pictographic}(?:\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}]|️|‍)*$/u.test(emoji)) { // regex for filtering out unicode emojis
+					if (!custom && !/^\p{Extended_Pictographic}(?:\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}]|️|‍)*$/u.test(emoji)) { // if it wasnt a custom emoji, so is it a unicode emoji (regex)
 						await submitted.editReply(buildStarboardPanel(current, guild, `${emoji} is not a valid emoji.`));
 						return;
 					}
