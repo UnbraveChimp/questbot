@@ -12,6 +12,10 @@ export type ServerSettings = {
 	loggingChannelId?: string | null;
 	haikuEnabled?: boolean;
 	autoPublisher?: boolean;
+	starboardEnable?: boolean;
+	starboardChannelId?: string | null;
+	starboardRequirement: number;
+	starboardEmoji: string;
 };
 
 export const DefaultSettings: ServerSettings = {
@@ -26,6 +30,10 @@ export const DefaultSettings: ServerSettings = {
 	loggingChannelId: null,
 	haikuEnabled: false,
 	autoPublisher: false,
+	starboardEnable: false,
+	starboardChannelId: null,
+	starboardRequirement: 3,
+	starboardEmoji: '⭐️',
 };
 
 // caching rather than ending up fetching the settings basically each message

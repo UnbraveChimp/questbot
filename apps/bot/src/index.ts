@@ -13,8 +13,9 @@ const client = new SapphireClient({
 		GatewayIntentBits.MessageContent,
 		GatewayIntentBits.GuildModeration,
 		GatewayIntentBits.GuildExpressions,
+		GatewayIntentBits.GuildMessageReactions,
 	],
-	partials: [Partials.Message, Partials.Channel],
+	partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User],
 	presence: {
 		status: 'online',
 	},

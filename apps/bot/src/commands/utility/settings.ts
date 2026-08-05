@@ -2,17 +2,22 @@ import { Command } from '@sapphire/framework';
 import {
 	ActionRowBuilder,
 	ButtonBuilder,
+	type ButtonInteraction,
 	ButtonStyle,
 	ChannelSelectMenuBuilder,
 	ChannelType,
 	type Guild,
 	InteractionContextType,
+	LabelBuilder,
 	type MessageComponentInteraction,
 	MessageFlags,
+	ModalBuilder,
 	PermissionFlagsBits,
 	RoleSelectMenuBuilder,
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
+	TextInputBuilder,
+	TextInputStyle,
 } from 'discord.js';
 import { getSettings, type ServerSettings, updateSettings } from '#lib/settings.js';
 import { errorEmbed, infoEmbed } from '#utils/embeds.js';
@@ -267,6 +272,81 @@ function buildAutoPublisherPanel(settings: ServerSettings, status?: string) {
 	};
 }
 
+function buildStarboardPanel(settings: ServerSettings, guild: Guild, status?: string) {
+	const currentChannelName = settings.starboardChannelId
+		? guild.channels.cache.get(settings.starboardChannelId)?.name
+		: null;
+
+	const toggleMenu = new StringSelectMenuBuilder()
+		.setCustomId('starboardToggle')
+		.setPlaceholder(`${settings.starboardEnable ? 'Enabled' : 'Disabled'}`)
+		.addOptions(
+			new StringSelectMenuOptionBuilder()
+				.setLabel('Enable')
+				.setDescription('Enable the starboard.')
+				.setValue('enable'),
+			new StringSelectMenuOptionBuilder()
+				.setLabel('Disable')
+				.setDescription('Disable the starboard.')
+				.setValue('disable'),
+		);
+
+	const channelMenu = new ChannelSelectMenuBuilder()
+		.setCustomId('starboardChannel')
+		.setPlaceholder(currentChannelName ? `#${currentChannelName}` : 'Select a channel for starred messages')
+		.setChannelTypes(ChannelType.GuildText);
+
+	const countButton = new ButtonBuilder()
+		.setCustomId('starboardCount')
+		.setLabel(`Configure Reaction Count`)
+		.setStyle(ButtonStyle.Secondary);
+
+	const emojiButton = new ButtonBuilder()
+		.setCustomId('starboardEmoji')
+		.setLabel(`Configure Emoji`)
+		.setStyle(ButtonStyle.Secondary);
+
+	return {
+		embeds: [
+			infoEmbed(
+				status
+					? `${emojis.rightArrow1} **Starboard** module:\n${emojis.rightArrow2} ${status}`
+					: `${emojis.rightArrow1} **Starboard** module:`,
+			),
+		],
+		components: [
+			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(toggleMenu),
+			new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(channelMenu),
+			new ActionRowBuilder<ButtonBuilder>().addComponents(countButton, emojiButton),
+		],
+	};
+}
+
+async function promptForValue(
+	button: ButtonInteraction,
+	name: string,
+	title: string,
+	label: string,
+	input: TextInputBuilder,
+) {
+	await button.showModal(
+		new ModalBuilder()
+			.setCustomId(name)
+			.setTitle(title)
+			.addLabelComponents(new LabelBuilder().setLabel(label).setTextInputComponent(input)),
+	);
+
+	const submitted = await button
+		.awaitModalSubmit({ filter: (m) => m.customId === name && m.user.id === button.user.id, time: 120_000 })
+		.catch(() => null);
+
+	if (!submitted?.isFromMessage()) return null;
+
+	await submitted.deferUpdate();
+
+	return submitted;
+}
+
 async function normalizeTicketSettings(guildId: string, guild: Guild, settings: ServerSettings) {
 	if (!settings.ticketCategoryId) return settings;
 
@@ -332,6 +412,10 @@ export class SettingsCommand extends Command {
 					.setLabel('Auto Publisher')
 					.setDescription('Automatically publish messages posted in announcement channels.')
 					.setValue('autoPublisher'),
+				new StringSelectMenuOptionBuilder()
+					.setLabel('Starboard')
+					.setDescription('Send messages in a channel when they get enough reactions.')
+					.setValue('starboard'),
 			);
 
 		const response = await interaction.reply({
@@ -383,6 +467,8 @@ export class SettingsCommand extends Command {
 				await settingChoice.update(buildHaikuPanel(settings));
 			} else if (settingChoice.values[0] === 'autoPublisher') {
 				await settingChoice.update(buildAutoPublisherPanel(settings));
+			} else if (settingChoice.values[0] === 'starboard') {
+				await settingChoice.update(buildStarboardPanel(settings, guild));
 			} else {
 				return;
 			}
@@ -460,6 +546,89 @@ export class SettingsCommand extends Command {
 					const next = await updateSettings(guildId, guild.name, { autoPublisher: enable });
 
 					await i.update(buildAutoPublisherPanel(next, `Auto Publisher **${enable ? 'enabled' : 'disabled'}**.`));
+				} else if (i.customId === 'starboardToggle' && i.isStringSelectMenu()) {
+					const enable = i.values[0] === 'enable';
+					const next = await updateSettings(guildId, guild.name, { starboardEnable: enable });
+
+					await i.update(buildStarboardPanel(next, guild, `Starboard **${enable ? 'enabled' : 'disabled'}**.`));
+				} else if (i.customId === 'starboardChannel' && i.isChannelSelectMenu()) {
+					const channelId = i.values[0];
+					const next = await updateSettings(guildId, guild.name, { starboardChannelId: channelId });
+
+					await i.update(buildStarboardPanel(next, guild, `Starboard channel set to <#${channelId}>.`));
+				} else if (i.customId === 'starboardCount' && i.isButton()) {
+					const current = await getSettings(guildId);
+
+					const submitted = await promptForValue(
+						i,
+						'starboardCountModal',
+						'Reactions Required',
+						`How many reactions are required? (1-99)`,
+						new TextInputBuilder()
+							.setCustomId('value')
+							.setStyle(TextInputStyle.Short)
+							.setRequired(true)
+							.setMinLength(1)
+							.setMaxLength(2)
+							.setValue(String(current.starboardRequirement)),
+					);
+
+					if (!submitted) return;
+
+					const requirement = Number(submitted.fields.getTextInputValue('value').trim());
+
+					if (!Number.isInteger(requirement) || requirement < 1 || requirement > 99) {
+						await submitted.editReply(
+							buildStarboardPanel(current, guild, 'That must be a whole number between 1 and 99.'),
+						);
+						return;
+					}
+
+					const next = await updateSettings(guildId, guild.name, { starboardRequirement: requirement });
+
+					await submitted.editReply(
+						buildStarboardPanel(
+							next,
+							guild,
+							`Starboard now requires **${requirement}** reaction${requirement === 1 ? '' : 's'}.`,
+						),
+					);
+				} else if (i.customId === 'starboardEmoji' && i.isButton()) {
+					const current = await getSettings(guildId);
+
+					const submitted = await promptForValue(
+						i,
+						'starboardEmojiModal',
+						'Starboard Emoji',
+						'Which emoji should be used?',
+						new TextInputBuilder()
+							.setCustomId('value')
+							.setStyle(TextInputStyle.Short)
+							.setRequired(true)
+							.setMaxLength(64)
+							.setValue(current.starboardEmoji),
+					);
+
+					if (!submitted) return;
+
+					const emoji = submitted.fields.getTextInputValue('value').trim();
+					const custom = /^<a?:\w{2,32}:(\d{17,20})>$/.exec(emoji); // regex for filtering out custom emojis
+
+					if (!custom && !/^\p{Extended_Pictographic}(?:\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}]|️|‍)*$/u.test(emoji)) { // regex for filtering out unicode emojis
+						await submitted.editReply(buildStarboardPanel(current, guild, `${emoji} is not a valid emoji.`));
+						return;
+					}
+
+					if (custom && !guild.emojis.cache.has(custom[1])) {
+						await submitted.editReply(
+							buildStarboardPanel(current, guild, 'That emoji is not from this server.'),
+						);
+						return;
+					}
+
+					const next = await updateSettings(guildId, guild.name, { starboardEmoji: emoji });
+
+					await submitted.editReply(buildStarboardPanel(next, guild, `Starboard emoji set to ${emoji}.`));
 				}
 			});
 

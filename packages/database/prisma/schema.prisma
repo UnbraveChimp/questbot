@@ -86,6 +86,7 @@ model Server {
   afks        Afk[]
   giveaways   Giveaway[]
   channels    Channel[]
+  starboard   Starboard[]
 
   @@map("server")
 }
@@ -246,6 +247,19 @@ model Giveaway {
   @@index([guildId])
   @@index([ended, endsAt])
   @@map("giveaways")
+}
+
+model Starboard {
+  messageId          String   @id
+  guildId            String
+  channelId          String
+  starboardMessageId String   @unique
+  createdAt          DateTime @default(now())
+
+  server Server @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("starboard")
 }
 
 model Channel {

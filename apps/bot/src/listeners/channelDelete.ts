@@ -2,6 +2,7 @@ import { Listener } from '@sapphire/framework';
 import { type APIEmbedField, AuditLogEvent, type Channel, EmbedBuilder, Events } from 'discord.js';
 import { removeConfessionContextsByChannel } from '#lib/confessions.js';
 import { getRecentAuditLogEntry, isLoggingChannel, logEmbed } from '#lib/logging.js';
+import { removeStarboardEntriesByChannel } from '#lib/starboard.js';
 
 export class ChannelDeleteListener extends Listener<typeof Events.ChannelDelete> {
 	public constructor(context: Listener.LoaderContext, options: Listener.Options) {
@@ -15,6 +16,7 @@ export class ChannelDeleteListener extends Listener<typeof Events.ChannelDelete>
 		if (!('guild' in channel) || !channel.guild) return;
 
 		await removeConfessionContextsByChannel(channel.id).catch(() => null);
+		await removeStarboardEntriesByChannel(channel.id).catch(() => null);
 
 		if (await isLoggingChannel(channel.guild, channel.id)) return;
 
