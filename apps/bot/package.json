@@ -15,7 +15,12 @@
 	"bin": {
 		"questbot": "./dist/sharder.js"
 	},
-	"files": ["dist", "prisma/schema.prisma", "README.md", "LICENSE"],
+	"files": [
+		"dist",
+		"prisma/schema.prisma",
+		"README.md",
+		"LICENSE"
+	],
 	"scripts": {
 		"build": "rimraf dist && tsc",
 		"start": "node --env-file-if-exists=../../.env dist/sharder.js",
@@ -27,6 +32,7 @@
 		"@questbot/database": "workspace:*",
 		"@sapphire/framework": "^5.5.0",
 		"@types/ms": "^2.1.0",
+		"countries-and-timezones": "^3.9.0",
 		"discord.js": "^14.27.0",
 		"ipaddr.js": "^2.4.0",
 		"ms": "^2.1.3",
