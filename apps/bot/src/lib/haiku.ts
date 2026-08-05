@@ -1,3 +1,7 @@
+// QuestBot: A free and open-source Discord Bot.
+// Copyright(C) 2026 Vantern
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import { cmuDictionaryLookup, syllableCount } from 'syllable-count-english';
 
 // all 15 ARPAbet vowel phonemes, each one is a syllable basically

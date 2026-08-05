@@ -1,3 +1,7 @@
+// QuestBot: A free and open-source Discord Bot.
+// Copyright(C) 2026 Vantern
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import { Button } from '~/components/button/button';
 import { Dropdown } from '~/components/dropdown/dropdown';
 import { Input } from '~/components/input/input';

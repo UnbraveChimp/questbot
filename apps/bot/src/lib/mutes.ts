@@ -1,3 +1,7 @@
+// QuestBot: A free and open-source Discord Bot.
+// Copyright(C) 2026 Vantern
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import { Prisma, prisma } from '@questbot/database';
 import type { Guild } from 'discord.js';
 import { type ShardInfo, shardOwns } from '#utils/sharding.js';

@@ -1,3 +1,7 @@
+// QuestBot: A free and open-source Discord Bot.
+// Copyright(C) 2026 Vantern
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import { prisma } from '@questbot/database';
 import { EmbedBuilder, type Message, type MessageReaction } from 'discord.js';
 import { truncate } from '#lib/logging.js';

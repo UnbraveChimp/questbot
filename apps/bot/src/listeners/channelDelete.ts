@@ -1,3 +1,7 @@
+// QuestBot: A free and open-source Discord Bot.
+// Copyright(C) 2026 Vantern
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import { Listener } from '@sapphire/framework';
 import { type APIEmbedField, AuditLogEvent, type Channel, EmbedBuilder, Events } from 'discord.js';
 import { removeConfessionContextsByChannel } from '#lib/confessions.js';
