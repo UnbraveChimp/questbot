@@ -24,6 +24,7 @@ export type ServerSettings = {
 	scamProtectionEnabled: boolean;
 	scamProtectionAction: ScamAction;
 	scamProtectionExemptionRole: string | null;
+	honeypotChannelId: string | null;
 };
 
 export const DefaultSettings: ServerSettings = {
@@ -45,6 +46,7 @@ export const DefaultSettings: ServerSettings = {
 	scamProtectionEnabled: false,
 	scamProtectionAction: 'delete',
 	scamProtectionExemptionRole: null,
+	honeypotChannelId: null,
 };
 
 // caching rather than ending up fetching the settings basically each message

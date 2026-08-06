@@ -6,6 +6,7 @@ import { Listener } from '@sapphire/framework';
 import { type APIEmbedField, AuditLogEvent, type Channel, EmbedBuilder, Events } from 'discord.js';
 import { removeConfessionContextsByChannel } from '#lib/confessions.js';
 import { getRecentAuditLogEntry, isLoggingChannel, logEmbed } from '#lib/logging.js';
+import { getSettings, updateSettings } from '#lib/settings.js';
 import { removeStarboardEntriesByChannel } from '#lib/starboard.js';
 
 export class ChannelDeleteListener extends Listener<typeof Events.ChannelDelete> {
@@ -21,6 +22,15 @@ export class ChannelDeleteListener extends Listener<typeof Events.ChannelDelete>
 
 		await removeConfessionContextsByChannel(channel.id).catch(() => null);
 		await removeStarboardEntriesByChannel(channel.id).catch(() => null);
+
+		// if the honey pot channel gets deleted, remove it from the settings
+		const settings = await getSettings(channel.guild.id).catch(() => null);
+
+		if (settings?.honeypotChannelId === channel.id) {
+			await updateSettings(channel.guild.id, channel.guild.name, { honeypotChannelId: null }).catch((err) =>
+				console.error(err),
+			);
+		}
 
 		if (await isLoggingChannel(channel.guild, channel.id)) return;
 

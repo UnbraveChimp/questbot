@@ -7,6 +7,7 @@ import { Events, type Message } from 'discord.js';
 import { containsBlockedWord } from '#lib/automod.js';
 import { autoPublish } from '#lib/autoPublisher.js';
 import { isHaiku } from '#lib/haiku.js';
+import { enforceHoneypot } from '#lib/honeypot.js';
 import { enforceScamProtection } from '#lib/scamProtection.js';
 import { getSettings } from '#lib/settings.js';
 
@@ -26,6 +27,7 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 		const settings = await getSettings(message.guild.id);
 
 		// nothing below will trigger as the message gets deleted
+		if (await enforceHoneypot(message, settings)) return;
 		if (await enforceScamProtection(message, settings)) return;
 
 		if (settings.haikuEnabled && isHaiku(message.content)) {

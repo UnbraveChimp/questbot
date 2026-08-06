@@ -23,6 +23,7 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 } from 'discord.js';
+import { createHoneypot, deleteHoneypot } from '#lib/honeypot.js';
 import { SCAM_ACTIONS, type ScamAction } from '#lib/scamProtection.js';
 import { getSettings, type ServerSettings, updateSettings } from '#lib/settings.js';
 import { errorEmbed, infoEmbed } from '#utils/embeds.js';
@@ -270,7 +271,7 @@ function buildAutoPublisherPanel(settings: ServerSettings, status?: string) {
 			infoEmbed(
 				status
 					? `${emojis.rightArrow1} **Auto Publisher** module:\n${emojis.rightArrow2} ${status}`
-					: `${emojis.rightArrow1} **Auto Publisher** module:\n${emojis.rightArrow2} I need **Manage Messages** (in your announcement channels) to publish other people's messages.`,
+					: `${emojis.rightArrow1} **Auto Publisher** module:\n${emojis.rightArrow2} Warning! I need **Manage Messages** (in your announcement channels) to publish other people's messages.`,
 			),
 		],
 		components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(toggleMenu)],
@@ -379,6 +380,31 @@ function buildScamProtectionPanel(settings: ServerSettings, guild: Guild, status
 	};
 }
 
+function buildHoneypotPanel(settings: ServerSettings, status?: string) {
+	const createButton = new ButtonBuilder()
+		.setCustomId('honeypotCreate')
+		.setLabel('Create')
+		.setStyle(ButtonStyle.Secondary)
+		.setDisabled(Boolean(settings.honeypotChannelId));
+
+	const deleteButton = new ButtonBuilder()
+		.setCustomId('honeypotDelete')
+		.setLabel('Delete')
+		.setStyle(ButtonStyle.Danger)
+		.setDisabled(!settings.honeypotChannelId);
+
+	return {
+		embeds: [
+			infoEmbed(
+				status
+					? `${emojis.rightArrow1} **Honey Pot** module:\n${emojis.rightArrow2} ${status}`
+					: `${emojis.rightArrow1} **Honey Pot** module:\n${emojis.rightArrow2} The channel catches spammers while it exists, so deleting it turns the module off.\n${emojis.rightArrow2} Warning! Please make sure I have **Manage Channels**, **Manage Messages** and **Kick Members**.`,
+			),
+		],
+		components: [new ActionRowBuilder<ButtonBuilder>().addComponents(createButton, deleteButton)],
+	};
+}
+
 async function promptForValue(
 	button: ButtonInteraction,
 	name: string,
@@ -477,6 +503,10 @@ export class SettingsCommand extends Command {
 					.setLabel('Scam Protection')
 					.setDescription('Stop members from spamming across several channels at once.')
 					.setValue('scamProtection'),
+				new StringSelectMenuOptionBuilder()
+					.setLabel('Honey Pot')
+					.setDescription('Trap bots with a channel that kicks anyone who posts in it.')
+					.setValue('honeypot'),
 			);
 
 		const response = await interaction.reply({
@@ -532,6 +562,8 @@ export class SettingsCommand extends Command {
 				await settingChoice.update(buildStarboardPanel(settings, guild));
 			} else if (settingChoice.values[0] === 'scamProtection') {
 				await settingChoice.update(buildScamProtectionPanel(settings, guild));
+			} else if (settingChoice.values[0] === 'honeypot') {
+				await settingChoice.update(buildHoneypotPanel(settings));
 			} else {
 				return;
 			}
@@ -718,6 +750,43 @@ export class SettingsCommand extends Command {
 					const next = await updateSettings(guildId, guild.name, { scamProtectionExemptionRole: null });
 
 					await i.update(buildScamProtectionPanel(next, guild, 'Exemption role removed.'));
+				} else if (i.customId === 'honeypotCreate' && i.isButton()) {
+					await i.deferUpdate();
+
+					const current = await getSettings(guildId);
+
+					if (current.honeypotChannelId) {
+						await i.editReply(buildHoneypotPanel(current, 'The honey pot channel already exists.'));
+						return;
+					}
+
+					const channel = await createHoneypot(guild).catch((err) => {
+						console.error(err);
+						return null;
+					});
+
+					if (!channel) {
+						await i.editReply(
+							buildHoneypotPanel(
+								current,
+								'I could not create the channel. Please make sure I have the correct permissions.',
+							),
+						);
+						return;
+					}
+
+					const next = await updateSettings(guildId, guild.name, { honeypotChannelId: channel.id });
+
+					await i.editReply(buildHoneypotPanel(next, `Honey Pot channel created at <#${channel.id}>.`));
+				} else if (i.customId === 'honeypotDelete' && i.isButton()) {
+					await i.deferUpdate();
+
+					const current = await getSettings(guildId);
+					if (current.honeypotChannelId) await deleteHoneypot(guild, current.honeypotChannelId);
+
+					const next = await updateSettings(guildId, guild.name, { honeypotChannelId: null });
+
+					await i.editReply(buildHoneypotPanel(next, 'Honey Pot channel deleted.'));
 				}
 			});
 
