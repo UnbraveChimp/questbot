@@ -103,4 +103,7 @@ export async function syncStarboard(reaction: MessageReaction): Promise<void> {
 			starboardMessageId: posted.id,
 		},
 	});
+
+	// react with the emoji on the post
+	await posted.react(emoji).catch((err) => console.error(err));
 }
