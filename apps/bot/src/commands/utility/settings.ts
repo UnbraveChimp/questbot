@@ -398,7 +398,7 @@ function buildHoneypotPanel(settings: ServerSettings, status?: string) {
 			infoEmbed(
 				status
 					? `${emojis.rightArrow1} **Honey Pot** module:\n${emojis.rightArrow2} ${status}`
-					: `${emojis.rightArrow1} **Honey Pot** module:\n${emojis.rightArrow2} The channel catches spammers while it exists, so deleting it turns the module off.\n${emojis.rightArrow2} Warning! Please make sure I have **Manage Channels**, **Manage Messages** and **Kick Members**.`,
+					: `${emojis.rightArrow1} **Honey Pot** module:\nThe channel catches spammers while it exists, so deleting it turns the module off.\n${emojis.rightArrow2} Warning! Please make sure I have **Manage Channels**, **Manage Messages** and **Kick Members**.`,
 			),
 		],
 		components: [new ActionRowBuilder<ButtonBuilder>().addComponents(createButton, deleteButton)],
