@@ -15,12 +15,7 @@
 	"bin": {
 		"questbot": "./dist/sharder.js"
 	},
-	"files": [
-		"dist",
-		"prisma/schema.prisma",
-		"README.md",
-		"LICENSE"
-	],
+	"files": ["dist", "prisma/schema.prisma", "README.md", "LICENSE"],
 	"scripts": {
 		"build": "rimraf dist && tsc",
 		"start": "node --env-file-if-exists=../../.env dist/sharder.js",

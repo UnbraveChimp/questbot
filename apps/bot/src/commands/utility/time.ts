@@ -55,7 +55,9 @@ export class TimeCommand extends Command {
 		if (!VALID_ZONES.has(location)) {
 			await interaction.reply({
 				embeds: [
-					errorEmbed(`${emojis.rightArrow2} \`${location}\` is not a timezone... or I don't know about it; Try something else.`),
+					errorEmbed(
+						`${emojis.rightArrow2} \`${location}\` is not a timezone... or I don't know about it; Try something else.`,
+					),
 				],
 				flags: MessageFlags.Ephemeral,
 			});

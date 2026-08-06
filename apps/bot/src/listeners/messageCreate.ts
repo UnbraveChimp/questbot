@@ -7,6 +7,7 @@ import { Events, type Message } from 'discord.js';
 import { containsBlockedWord } from '#lib/automod.js';
 import { autoPublish } from '#lib/autoPublisher.js';
 import { isHaiku } from '#lib/haiku.js';
+import { enforceScamProtection } from '#lib/scamProtection.js';
 import { getSettings } from '#lib/settings.js';
 
 export class MessageCreateListener extends Listener<typeof Events.MessageCreate> {
@@ -23,6 +24,10 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 		// by doing this you ALLOW it to reply to bots haiku's such as ai bots writing one :D
 		const content = message.content.toLowerCase();
 		const settings = await getSettings(message.guild.id);
+
+		// nothing below will trigger as the message gets deleted
+		if (await enforceScamProtection(message, settings)) return;
+
 		if (settings.haikuEnabled && isHaiku(message.content)) {
 			await message.reply("That's a haiku!").catch((err) => console.error(err));
 		}
@@ -58,6 +63,7 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 
 		if (moderatorIds.includes(message.author.id)) {
 			if (content.includes('<@1494686224508522579>')) {
+				// acts as a way to check if someone is a bot moderator
 				await message.reply('Why hello there!').catch((err) => console.error(err));
 			}
 		}

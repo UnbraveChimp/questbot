@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { type Prisma, prisma } from '@questbot/database';
+import type { ScamAction } from './scamProtection.js';
 
 export type ServerSettings = {
 	welcomePeople: boolean;
@@ -20,6 +21,9 @@ export type ServerSettings = {
 	starboardChannelId?: string | null;
 	starboardRequirement: number;
 	starboardEmoji: string;
+	scamProtectionEnabled: boolean;
+	scamProtectionAction: ScamAction;
+	scamProtectionExemptionRole: string | null;
 };
 
 export const DefaultSettings: ServerSettings = {
@@ -38,6 +42,9 @@ export const DefaultSettings: ServerSettings = {
 	starboardChannelId: null,
 	starboardRequirement: 3,
 	starboardEmoji: '⭐️',
+	scamProtectionEnabled: false,
+	scamProtectionAction: 'delete',
+	scamProtectionExemptionRole: null,
 };
 
 // caching rather than ending up fetching the settings basically each message
