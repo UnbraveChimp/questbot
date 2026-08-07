@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { Listener } from '@sapphire/framework';
-import { Events, type MessageReaction, type PartialMessageReaction } from 'discord.js';
+import { Events, type MessageReaction, type PartialMessageReaction, type PartialUser, type User } from 'discord.js';
 import { syncStarboard } from '#lib/starboard.js';
 
 export class StarboardAddListener extends Listener<typeof Events.MessageReactionAdd> {
@@ -14,7 +14,7 @@ export class StarboardAddListener extends Listener<typeof Events.MessageReaction
 		});
 	}
 
-	public async run(reaction: MessageReaction | PartialMessageReaction) {
-		await syncStarboard(reaction as MessageReaction).catch(() => {});
+	public async run(reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) {
+		await syncStarboard(reaction as MessageReaction, user).catch(() => {});
 	}
 }

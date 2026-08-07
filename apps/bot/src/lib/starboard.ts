@@ -3,7 +3,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { prisma } from '@questbot/database';
-import { EmbedBuilder, type Message, type MessageReaction } from 'discord.js';
+import {
+	DiscordAPIError,
+	EmbedBuilder,
+	type Message,
+	type MessageReaction,
+	type PartialUser,
+	RESTJSONErrorCodes,
+	type User,
+} from 'discord.js';
 import { truncate } from '#lib/logging.js';
 import { getSettings } from '#lib/settings.js';
 import { Colors } from '#utils/embeds.js';
@@ -15,6 +23,43 @@ function normalize(emoji: string | null | undefined): string {
 
 function reactionEmoji(reaction: MessageReaction): string {
 	return reaction.emoji.id ? reaction.emoji.toString() : (reaction.emoji.name ?? '');
+}
+
+function findReaction(message: Message | null, emoji: string): MessageReaction | null {
+	return message?.reactions.cache.find((found) => normalize(reactionEmoji(found)) === normalize(emoji)) ?? null;
+}
+
+async function reactorIds(reaction: MessageReaction): Promise<Set<string>> {
+	const ids = new Set<string>();
+	let after: string | undefined;
+
+	while (true) {
+		const users = await reaction.users.fetch({ limit: 100, after }).catch(() => null);
+		if (!users?.size) break;
+
+		for (const id of users.keys()) ids.add(id);
+		if (users.size < 100) break;
+
+		after = users.lastKey();
+	}
+
+	return ids;
+}
+
+async function countStars(emoji: string, message: Message, posted: Message | null): Promise<number> {
+	const source = findReaction(message, emoji);
+	const mirror = findReaction(posted, emoji);
+
+	const stars = source?.count ?? 0;
+	const mirrored = (mirror?.count ?? 0) - (mirror?.me ? 1 : 0); //* our reaction is a "shortcut" not a star
+
+	// only fetch on overlap between both
+	if (!source || !mirror || mirrored < 1) return stars + Math.max(mirrored, 0);
+
+	const starred = await reactorIds(source);
+	const both = [...(await reactorIds(mirror))].filter((id) => starred.has(id)).length;
+
+	return stars + mirrored - both;
 }
 
 function buildStarboardMessage(message: Message<true>, emoji: string, count: number) {
@@ -49,30 +94,61 @@ export async function removeStarboardEntriesByChannel(channelId: string) {
 	await prisma.starboard.deleteMany({ where: { channelId } });
 }
 
-export async function syncStarboard(reaction: MessageReaction): Promise<void> {
+export async function syncStarboard(reaction: MessageReaction, user: User | PartialUser): Promise<void> {
+	if (user.id === reaction.client.user.id) return; // our initial reaction does NOT count
+
 	const full = reaction.partial ? await reaction.fetch().catch(() => null) : reaction;
 	if (!full) return;
 
-	const message = full.message.partial ? await full.message.fetch().catch(() => null) : full.message;
-	if (!message?.inGuild()) return;
+	const reacted = full.message.partial ? await full.message.fetch().catch(() => null) : full.message;
+	if (!reacted?.inGuild()) return;
 
-	const settings = await getSettings(message.guildId);
+	const settings = await getSettings(reacted.guildId);
 	if (!settings.starboardEnable || !settings.starboardChannelId) return;
-
-	if (message.author.id === message.client.user.id && message.channelId === settings.starboardChannelId) return; //* don't post our own messages from the starboard channel but allow other users to be posted from the starboard channel
 	if (normalize(reactionEmoji(full)) !== normalize(settings.starboardEmoji)) return;
 
-	const emoji = settings.starboardEmoji ?? reactionEmoji(full);
-	const count = full.count ?? 0;
-	const entry = await getStarboardEntry(message.id);
-
-	const channel = await getChannel(message.client.channels, settings.starboardChannelId);
+	const channel = await getChannel(reacted.client.channels, settings.starboardChannelId);
 	if (!channel?.isTextBased() || !channel.isSendable()) return;
+
+	const isPost = reacted.author.id === reacted.client.user.id && reacted.channelId === settings.starboardChannelId;
+	const entry = isPost
+		? await prisma.starboard.findUnique({ where: { starboardMessageId: reacted.id } })
+		: await getStarboardEntry(reacted.id);
+
+	if (isPost && !entry) return; //* don't post our own messages from the starboard channel but allow other users to be posted from the starboard channel
+
+	let message = reacted;
+	let posted: Message | null = isPost ? reacted : null;
+
+	if (isPost && entry) {
+		//* reaction on our posts counts towards the message it mirrors
+		const origin = await getChannel(reacted.client.channels, entry.channelId);
+		if (!origin?.isTextBased()) return;
+
+		try {
+			const original = await origin.messages.fetch(entry.messageId);
+			if (!original.inGuild()) return;
+
+			message = original;
+		} catch (err: unknown) {
+			if (!(err instanceof DiscordAPIError) || err.code !== RESTJSONErrorCodes.UnknownMessage) return;
+
+			//* the mirrored message is gone, so we don't have to track it anymore
+			await reacted.delete().catch(() => {});
+			await removeStarboardEntry(entry.messageId);
+
+			return;
+		}
+	} else if (entry) {
+		posted = await channel.messages.fetch(entry.starboardMessageId).catch(() => null);
+	}
+
+	const emoji = settings.starboardEmoji;
+	const count = await countStars(emoji, message, posted);
 
 	if (count < settings.starboardRequirement) {
 		if (!entry) return;
 
-		const posted = await channel.messages.fetch(entry.starboardMessageId).catch(() => null);
 		await posted?.delete().catch(() => {});
 		await removeStarboardEntry(message.id);
 
@@ -81,29 +157,32 @@ export async function syncStarboard(reaction: MessageReaction): Promise<void> {
 
 	const payload = buildStarboardMessage(message, emoji, count);
 
-	if (entry) {
-		const posted = await channel.messages.fetch(entry.starboardMessageId).catch(() => null);
-
-		if (posted) {
-			await posted.edit(payload).catch(() => {});
-			return;
-		}
-
-		await removeStarboardEntry(message.id);
+	if (posted) {
+		if (posted.content !== payload.content) await posted.edit(payload).catch(() => {});
+		return;
 	}
 
-	const posted = await channel.send(payload).catch(() => null);
-	if (!posted) return;
+	if (entry) await removeStarboardEntry(message.id);
 
-	await prisma.starboard.create({
-		data: {
-			messageId: message.id,
-			guildId: message.guildId,
-			channelId: message.channelId,
-			starboardMessageId: posted.id,
-		},
-	});
+	const sent = await channel.send(payload).catch(() => null);
+	if (!sent) return;
+
+	const created = await prisma.starboard
+		.create({
+			data: {
+				messageId: message.id,
+				guildId: message.guildId,
+				channelId: message.channelId,
+				starboardMessageId: sent.id,
+			},
+		})
+		.catch(() => null);
+
+	if (!created) {
+		await sent.delete().catch(() => {});
+		return;
+	}
 
 	// react with the emoji on the post
-	await posted.react(emoji).catch((err) => console.error(err));
+	await sent.react(emoji).catch((err) => console.error(err));
 }
