@@ -33,7 +33,7 @@ export class TimeCommand extends Command {
 				.addStringOption((option: SlashCommandStringOption) =>
 					option
 						.setName('location')
-						.setDescription('A city, country, country code, or timezone.')
+						.setDescription('Search for a city or country')
 						.setAutocomplete(true)
 						.setRequired(true)
 						.setMaxLength(64),
